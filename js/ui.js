@@ -231,10 +231,11 @@ function drawHUD(){
     const pw=480,ph=244,px=W/2-pw/2,py=H/2-122;
     panel(px,py,pw,ph);ribbonFit(W/2,py+4,'⏸ واقف',26,'#2f6fd0',220);
     txt(LV[G.level].name,W/2,py+62,16,'#e6e2f4','center',false);
-    btn(W/2+10,py+92,200,48,'▶ كمل',()=>{G.paused=false;},'gold');
-    btn(W/2-210,py+92,200,48,'🗺 الخريطة',resetMenu,'dark');
-    btn(W/2-60,py+150,120,34,'⚙ الصوت',sndOpen,'dark',{size:14});
-    txt(padCount?'🎮 Start ولا B باش تكمل  —  Select للخريطة':'Esc باش تكمل  —  Backspace للخريطة',W/2,py+210,13,'#bdb8d6','center',false);
+    const ps=G.psel|0; // the button the arrows / D-pad are on glows gold
+    btn(W/2+10,py+92,200,48,'▶ كمل',()=>{G.paused=false;},ps===0?'gold':'dark',{glow:ps===0});
+    btn(W/2-210,py+92,200,48,'🗺 الخريطة',resetMenu,ps===1?'gold':'dark',{glow:ps===1});
+    btn(W/2-60,py+150,120,34,'⚙ الصوت',sndOpen,ps===2?'gold':'dark',{size:14,glow:ps===2});
+    txt(padCount?'🎮 ◀▶▼ ختار  •  A دوز  •  B كمل':'Esc باش تكمل  —  Backspace للخريطة',W/2,py+210,13,'#bdb8d6','center',false);
   }
 }
 function drawShop(){
@@ -328,9 +329,10 @@ function drawOver(){
   panel(px,py,pw,ph,{frame:FRAMES.red,top:'#3a1426',bot:'#1a0812'});
   ribbonFit(W/2,py+4,'💀 خسرتو!',30,'#b8322a',240);
   txt('الحروف طاحو كاملين... ولكن المغامرة باقا',W/2,py+66,16,'#f0dce4','center',false);
-  btn(W/2+10,py+100,210,50,'↻ عاود المرحلة',()=>startLevel(G.level),'gold');
-  btn(W/2-220,py+100,210,50,'🗺 الخريطة',resetMenu,'dark');
-  txt('Enter = عاود     Esc = الخريطة',W/2,py+188,13,'#c8b0bc','center',false);
+  const os=G.osel|0;
+  btn(W/2+10,py+100,210,50,'↻ عاود المرحلة',()=>startLevel(G.level),os===0?'gold':'dark',{glow:os===0});
+  btn(W/2-220,py+100,210,50,'🗺 الخريطة',resetMenu,os===1?'gold':'dark',{glow:os===1});
+  txt(padCount?'🎮 ◀▶ ختار  •  A دوز  •  B الخريطة':'◀▶ ختار  •  Enter دوز  •  Esc الخريطة',W/2,py+188,13,'#c8b0bc','center',false);
 }
 function drawWin(){
   drawBG(4,frame*0.5);
@@ -340,6 +342,7 @@ function drawWin(){
   vignette(0.55);
   ribbonFit(W/2,72,'🏆 مبروك! ربحتو اللعبة 🏆',30,'#c8800e',380);
   pill(W/2,126,'الكتاب الكبير رجع كامل... والهمزة رجعات للعائلة','#3a3f78',16);
+  txt('🎮 لعبة من تطوير المهدي وهبي',W/2,162,15,'#ffe9a8','center',INK);
   const RL=G.roster.map(h=>h.idx),NH=RL.length,st=Math.min(150,(W-60)/NH);
   for(let k=0;k<NH;k++){
     const i=RL[k],x=W/2+((NH-1)/2-k)*st,jump=Math.abs(Math.sin(frame*0.1+i))*30,py=392;

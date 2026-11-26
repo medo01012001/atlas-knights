@@ -142,7 +142,7 @@ function makeHero(i,ctrl){
 }
 function startGame(){startStage(menu.sel);}
 function startLevel(n){
-  Object.assign(G,{level:n,cam:0,enemies:[],proj:[],fx:[],pick:[],zones:[],texts:[],cps:[520,1040,1560,2080],bossX:2600,end:3100,readyT:0,fightT:0,
+  Object.assign(G,{level:n,cam:0,enemies:[],proj:[],fx:[],pick:[],zones:[],texts:[],cps:[520,1040,1560,2080],bossX:2600,end:3100,readyT:0,fightT:0,osel:0,psel:0,
     cpi:0,lock:null,queue:[],spawnT:0,boss:null,bossDone:false,doneT:0,goT:0,overT:0,paused:false,banner:{t:200,s:LV[n].name}});
   let joined=null;
   if(n>0&&n%JOIN_EVERY===0&&!PROG.joins[n]){ // a new letter appears every JOIN_EVERY levels
@@ -560,8 +560,18 @@ function updBoss(b){
 /* ================= GAME UPDATE ================= */
 function humans(){return G.heroes.filter(h=>h.ctrl!=='bot'&&!h.down);}
 function updPlay(){
-  if(pressed.Escape||pressed.KeyP)G.paused=!G.paused;
-  if(G.paused){if(pressed.Backspace)resetMenu();return;}
+  if(pressed.Escape||pressed.KeyP){G.paused=!G.paused;G.psel=0;}
+  if(G.paused){ // pause menu: arrows / D-pad pick a button (0 continue, 1 map, 2 sound), A or Enter presses it
+    if(pressed.Backspace){resetMenu();return;}
+    for(const p of [0,1]){
+      if(tap(p,'right')&&G.psel!==2){G.psel=0;SFX.coin();}
+      if(tap(p,'left')&&G.psel!==2){G.psel=1;SFX.coin();}
+      if(tap(p,'down')&&G.psel!==2){G.pprev=G.psel|0;G.psel=2;SFX.coin();}
+      if(tap(p,'up')&&G.psel===2){G.psel=G.pprev|0;SFX.coin();}
+      if(tap(p,'a')||(p===0&&(pressed.Enter||pressed.NumpadEnter))){const k=G.psel|0;if(k===0)G.paused=false;else if(k===1)resetMenu();else sndOpen();return;}
+    }
+    return;
+  }
   if(G.banner.t>0)G.banner.t--;
   if(G.goT>0)G.goT--;
   if(G.flashT>0)G.flashT--;
@@ -709,8 +719,10 @@ function updShop(){
 }
 function shopNext(){if(shop.from==='map')startStage(menu.sel);else{menu.sel=Math.min(G.level+1,LV.length-1);startStage(menu.sel);}}
 function updEnd(){
-  if(state==='over'){
-    if(pressed.Enter||pressed.NumpadEnter){startLevel(G.level);}
+  if(state==='over'){ // game over: arrows / D-pad pick retry or map, A or Enter presses it
+    for(const p of [0,1]){if(tap(p,'right')){G.osel=0;SFX.coin();}if(tap(p,'left')){G.osel=1;SFX.coin();}
+      if(tap(p,'a')){if(G.osel===1)resetMenu();else startLevel(G.level);return;}}
+    if(pressed.Enter||pressed.NumpadEnter){if(G.osel===1)resetMenu();else startLevel(G.level);}
     else if(pressed.Escape)resetMenu();
   }else if(pressed.Enter||pressed.NumpadEnter||pressed.Escape)resetMenu();
 }
@@ -1006,7 +1018,7 @@ function update(){
     if(padTap(p,'start')){if(state==='play')pressed.Escape=true;else pressed.Enter=true;}
     if(padTap(p,'back')){if(state==='play'&&G.paused)pressed.Backspace=true;else pressed.Escape=true;}
     if(padTap(p,'b')){if(state==='play'){if(G.paused)G.paused=false;}else if(state!=='story')pressed.Escape=true;} // B = back in every menu
-    if(padTap(p,'a')&&(state==='over'||state==='win'))pressed.Enter=true;
+    if(padTap(p,'a')&&state==='win')pressed.Enter=true;
   }
   if(state==='menu')updMenu();
   else if(state==='play')updPlay();

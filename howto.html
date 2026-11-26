@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>فرسان الأطلس — كيفاش تلعب</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/ui.css?v=3">
+<style>
+.cols{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+h2{margin:0 0 12px;font-size:24px;font-weight:800;color:var(--gold);text-shadow:0 2px 0 var(--ink)}
+.ctl{display:grid;grid-template-columns:auto 1fr;gap:10px 14px;align-items:center;font-size:17px}
+.ctl .k{display:flex;gap:5px;flex-wrap:wrap;direction:ltr;justify-content:flex-end}
+ul.tips{margin:0;padding:0 20px 0 0;font-size:17px;line-height:1.9}
+ul.tips li::marker{content:"✦  ";color:var(--gold)}
+.p1 h2{color:#8fc8ff}.p2 h2{color:#ff9a8a}
+.story{font-size:18px;line-height:1.9;margin:0}
+</style>
+</head>
+<body>
+<div class="page fade-in">
+  <div class="topbar">
+    <a class="btn dark small" href="index.html">→ رجوع</a>
+    <div class="mid"><span class="ribbon blue">🎮 كيفاش تلعب</span></div>
+    <a class="btn small" href="game.html">▶ العب</a>
+  </div>
+  <div class="grid" style="margin-top:28px">
+    <section class="panel"><span class="star s1"></span><span class="star s2"></span><span class="star s3"></span><span class="star s4"></span><div class="in">
+      <h2>📖 القصة</h2>
+      <p class="story">سيد الظلام سرق <b class="gold-t">الدواية الذهبية</b> من «الكتاب الكبير»، والحروف تفرقو فالبلاد. نتا كتبدا بحرف <b class="gold-t">الألف</b>، وكتمشي من الغابة حتى لقلعة الظلام باش ترجع الدواية. فالطريق الحكاية كتكمل شوية بشوية... وشكون هو سيد الظلام؟ غادي تعرف فاللخر. الأعداء قويين فالبداية، داكشي علاش جمع الفلوس وشري القوة من الحانوت.</p>
+    </div></section>
+    <div class="grid cols">
+      <section class="panel blue p1"><div class="in">
+        <h2>🔵 اللاعب 1 — الكلافيي</h2>
+        <div class="ctl" id="p1"></div>
+      </div></section>
+      <section class="panel red p2"><div class="in">
+        <h2>🔴 اللاعب 2 — الكلافيي</h2>
+        <div class="ctl" id="p2"></div>
+      </div></section>
+    </div>
+    <div class="grid cols">
+      <section class="panel steel"><div class="in">
+        <h2>🎮 المانيطة</h2>
+        <div class="ctl">
+          <div class="k"><span class="key wide">Stick</span></div><span>الحركة</span>
+          <div class="k"><span class="key">A</span></div><span>ضربة</span>
+          <div class="k"><span class="key">X</span><span class="key">B</span></div><span>المهارات</span>
+          <div class="k team-only"><span class="key">Y</span></div><span class="team-only">بدل الحرف</span>
+          <div class="k"><span class="key wide">Start</span></div><span>وقف / كمل</span>
+        </div>
+      </div></section>
+      <section class="panel steel"><div class="in">
+        <h2>🖱 الماوس واللمس</h2>
+        <ul class="tips">
+          <li>القوائم كاملين خدامين بالكليك.</li>
+          <li>فالقائمة: كليك عادي = اللاعب 1، كليك يمين = اللاعب 2.</li>
+          <li>فالحانوت كليكي على القوة باش تشريها.</li>
+          <li>كليك جوج مرات ولا <span class="key">F</span> = شاشة كاملة.</li>
+        </ul>
+      </div></section>
+    </div>
+    <section class="panel team-only"><span class="star s1"></span><span class="star s2"></span><span class="star s3"></span><span class="star s4"></span><div class="in">
+      <h2>👥 الفريق</h2>
+      <ul class="tips">
+        <li>كاين حتى 4 حروف فالشاشة فنفس الوقت، والباقيين كيتسناو فالاحتياط وكيرتاحو.</li>
+        <li>بدل الحرف اللي كتلعب بيه بـ <span class="key" id="swk">Q</span> — الحرف اللي خرج كيولي بوت.</li>
+        <li>البوتات كيفكرو بوحدهم: كيختارو العدو، كيهربو من الضربات وكيستعملو المهارات فالوقت المناسب.</li>
+      </ul>
+    </div></section>
+    <section class="panel"><span class="star s1"></span><span class="star s2"></span><span class="star s3"></span><span class="star s4"></span><div class="in">
+      <h2>💡 نصائح</h2>
+      <ul class="tips">
+        <li>كل حرف عندو خاصية ومهارتين — شوفهم فصفحة <a href="letters.html" class="gold-t">الحروف</a>.</li>
+        <li>القلوب اللي كيطيحو من الأعداء كيرجعو الصحة.</li>
+        <li>إلى طاح شي حرف، عندك شوية ديال الوقت باش يرجع.</li>
+        <li>البوس كيوجد الضربة ديالو — شوف الحركة ديالو وبعد.</li>
+        <li>صاحبك يقدر يدخل معاك حتى فوسط اللعب بالضربة ديالو.</li>
+      </ul>
+    </div></section>
+  </div>
+</div>
+<script src="js/core.js?v=3"></script>
+<script src="js/data.js?v=3"></script>
+<script src="js/letters.js?v=3"></script>
+<script src="js/site.js?v=3"></script>
+<script>
+'use strict';
+const team=FOUND_LIST.length>1;
+document.querySelectorAll('.team-only').forEach(e=>e.classList.toggle('hide',!team));
+const K={KeyW:'W',KeyA:'A',KeyS:'S',KeyD:'D',KeyJ:'J',KeyK:'K',KeyL:'L',KeyQ:'Q',Comma:',',Period:'.',Slash:'/',Semicolon:';'};
+function rows(id,list){document.getElementById(id).innerHTML=list.filter(r=>!r[2]||team).map(([keys,lab])=>'<div class="k">'+keys.map(k=>'<span class="key'+(k.length>2?' wide':'')+'">'+k+'</span>').join('')+'</div><span>'+lab+'</span>').join('');}
+function render(){
+  rows('p1',[[[K.KeyW,K.KeyA,K.KeyS,K.KeyD],'الحركة'],[[K.KeyJ],'ضربة'],[[K.KeyK],'المهارة الأولى'],[[K.KeyL],'المهارة الثانية'],[[K.KeyQ],'بدل الحرف',1],[['Esc'],'وقف / كمل']]);
+  rows('p2',[[['↑','←','↓','→'],'الحركة'],[[K.Comma,'Num 1'],'ضربة'],[[K.Period,'Num 2'],'المهارة الأولى'],[[K.Slash,'Num 3'],'المهارة الثانية'],[[K.Semicolon,'Num 0'],'بدل الحرف',1]]);
+  document.getElementById('swk').textContent=K.KeyQ;
+}
+render();
+try{navigator.keyboard.getLayoutMap().then(m=>{for(const k in K){const v=m.get(k);if(v)K[k]=v.toUpperCase();}render();}).catch(()=>{});}catch(e){}
+</script>
+</body>
+</html>

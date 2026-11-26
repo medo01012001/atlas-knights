@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>فرسان الأطلس — الإعدادات</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/ui.css?v=3">
+<style>
+.wrap{max-width:720px;margin:28px auto 0}
+.val{min-width:54px;text-align:center}
+.saved{position:fixed;bottom:22px;left:50%;transform:translate(-50%,30px);opacity:0;transition:.25s;z-index:60}
+.saved.show{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+<div class="page fade-in">
+  <div class="topbar">
+    <a class="btn dark small" href="index.html">→ رجوع</a>
+    <div class="mid"><span class="ribbon green">⚙ الإعدادات</span></div>
+    <a class="btn small" href="game.html">▶ العب</a>
+  </div>
+  <div class="wrap">
+    <section class="panel"><span class="star s1"></span><span class="star s2"></span><span class="star s3"></span><span class="star s4"></span><div class="in">
+      <div class="row">
+        <div class="lab">🔊 الصوت<small>علو الأصوات فاللعبة</small></div>
+        <div style="display:flex;gap:12px;align-items:center"><input type="range" id="vol" min="0" max="100" step="5" aria-label="الصوت"><span class="pill val" id="volv"></span></div>
+      </div>
+      <div class="row">
+        <div class="lab">⚔ الصعوبة<small>قوة الأعداء والبوس</small></div>
+        <div class="seg" id="diff"></div>
+      </div>
+      <div class="row">
+        <div class="lab">📳 اهتزاز الشاشة<small>فاش كتكون شي ضربة قوية</small></div>
+        <button class="toggle" id="shake" aria-label="اهتزاز الشاشة"></button>
+      </div>
+      <div class="row">
+        <div class="lab">⛶ الشاشة الكاملة<small>ولا كليك جوج مرات فاللعبة</small></div>
+        <button class="btn dark small" id="fs">شاشة كاملة</button>
+      </div>
+      <div class="row">
+        <div class="lab">🗑 مسح التقدم<small>ترجع تبدا من الأول بالألف بوحدو</small></div>
+        <button class="btn red small" id="reset">مسح</button>
+      </div>
+    </div></section>
+  </div>
+</div>
+<div class="modal hide" id="modal" role="dialog" aria-modal="true">
+  <div class="panel red"><div class="in">
+    <p style="margin:6px 0 4px"><span class="ribbon">⚠ متأكد؟</span></p>
+    <p style="font-size:18px;margin:18px 0 22px">غادي تمسح الحروف اللي لقيتي. هادشي ما كيرجعش.</p>
+    <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+      <button class="btn red" id="yes">إيه، مسح</button>
+      <button class="btn dark" id="no">لا، رجع</button>
+    </div>
+  </div></div>
+</div>
+<span class="pill green saved" id="saved">✔ تسجل</span>
+<script src="js/core.js?v=3"></script>
+<script src="js/data.js?v=3"></script>
+<script src="js/letters.js?v=3"></script>
+<script src="js/site.js?v=3"></script>
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+let tSaved=0;
+function saved(){saveSet();const s=$('saved');s.classList.add('show');clearTimeout(tSaved);tSaved=setTimeout(()=>s.classList.remove('show'),1100);}
+// volume
+const vol=$('vol');
+function showVol(){const v=Math.round(SET.vol*100);vol.value=v;vol.style.setProperty('--p',v+'%');$('volv').textContent=v===0?'🔇':v+'%';}
+vol.addEventListener('input',()=>{SET.vol=vol.value/100;showVol();});
+vol.addEventListener('change',()=>{saved();uiSnd(700,0.12,300);});
+showVol();
+// difficulty
+function showDiff(){$('diff').innerHTML='';DIFFS.forEach((d,k)=>{const b=document.createElement('button');b.className='btn small '+(SET.diff===k?'blue':'dark');b.textContent=d.name;
+  b.onclick=()=>{SET.diff=k;showDiff();saved();};$('diff').appendChild(b);});}
+showDiff();
+// shake
+function showShake(){$('shake').classList.toggle('on',!!SET.shake);$('shake').setAttribute('aria-pressed',!!SET.shake);}
+$('shake').onclick=()=>{SET.shake=SET.shake?0:1;showShake();saved();clickSnd();};
+showShake();
+// fullscreen
+$('fs').onclick=()=>{try{if(!document.fullscreenElement)document.documentElement.requestFullscreen();else document.exitFullscreen();}catch(e){}};
+document.addEventListener('fullscreenchange',()=>{$('fs').textContent=document.fullscreenElement?'خروج':'شاشة كاملة';});
+// reset progress
+$('reset').onclick=()=>{$('modal').classList.remove('hide');$('no').focus();};
+$('no').onclick=()=>$('modal').classList.add('hide');
+$('yes').onclick=()=>{try{localStorage.removeItem('atlasFound');}catch(e){}$('modal').classList.add('hide');$('saved').textContent='✔ تمسح';saved();setTimeout(()=>{$('saved').textContent='✔ تسجل';},1300);};
+</script>
+</body>
+</html>

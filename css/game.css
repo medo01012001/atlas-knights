@@ -1,0 +1,4 @@
+html,body{margin:0;height:100%;background:#0b0a18;overflow:hidden}
+body{animation:fadeIn .4s ease both}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+canvas{display:block;position:absolute;inset:0;margin:auto;border-radius:6px;box-shadow:0 0 0 2px #120c1c,0 20px 60px rgba(0,0,0,.6);touch-action:none}

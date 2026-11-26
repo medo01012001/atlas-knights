@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>فرسان الأطلس</title>
+<meta name="description" content="فرسان الأطلس — مغامرة الحروف العربية ضد جيش الظلام">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/ui.css?v=3">
+<style>
+html,body{height:100%;overflow:hidden}
+.scene{position:fixed;inset:0;overflow:hidden;z-index:0;background:linear-gradient(180deg,#2a1450 0%,#7a2a5a 38%,#e0683a 62%,#ffb05a 72%,#3a2240 72.2%)}
+.sun{position:absolute;left:50%;top:44%;width:240px;height:240px;margin-left:-120px;border-radius:50%;background:radial-gradient(circle,#fff6c8 0%,#ffd060 45%,rgba(255,150,60,0) 70%);animation:pulse 6s ease-in-out infinite}
+@keyframes pulse{50%{transform:scale(1.06)}}
+.stars{position:absolute;inset:0 0 50% 0;background-image:radial-gradient(1.6px 1.6px at 12% 18%,#fff,transparent),radial-gradient(1.4px 1.4px at 28% 8%,#fff,transparent),radial-gradient(1.8px 1.8px at 46% 22%,#fff,transparent),radial-gradient(1.3px 1.3px at 64% 12%,#fff,transparent),radial-gradient(1.6px 1.6px at 82% 20%,#fff,transparent),radial-gradient(1.2px 1.2px at 92% 6%,#fff,transparent),radial-gradient(1.4px 1.4px at 6% 34%,#fff,transparent),radial-gradient(1.4px 1.4px at 74% 32%,#fff,transparent);opacity:.8;animation:tw 4s ease-in-out infinite}
+@keyframes tw{50%{opacity:.4}}
+.layer{position:absolute;left:0;width:200%;bottom:0;background-repeat:repeat-x;background-size:50% 100%;animation:pan linear infinite}
+@keyframes pan{to{transform:translateX(50%)}}
+.l1{height:58%;animation-duration:140s;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 300' preserveAspectRatio='none'%3E%3Cpath d='M0 300V170L90 90L160 140L260 40L360 150L450 80L560 160L650 60L760 150L850 100L1000 170V300Z' fill='%234a2a5e'/%3E%3Cpath d='M260 40L230 70L250 66L270 80L290 62Z M650 60L620 92L645 86L665 100L685 82Z' fill='%23f4e6ff' fill-opacity='.7'/%3E%3C/svg%3E")}
+.l2{height:40%;animation-duration:80s;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 200' preserveAspectRatio='none'%3E%3Cpath d='M0 200V110L120 60L220 120L340 50L470 120L580 70L700 130L820 60L1000 110V200Z' fill='%23301a44'/%3E%3C/svg%3E")}
+.l3{height:30%;animation-duration:50s;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 160' preserveAspectRatio='none'%3E%3Cg fill='%231c1030'%3E%3Cpath d='M0 160V100H1000V160Z'/%3E%3Cpath d='M120 100V40H130V30H140V40H150V30H160V40H170V30H180V40H190V100Z'/%3E%3Cpath d='M135 100V70Q155 52 175 70V100Z' fill='%23ffb040'/%3E%3Cpath d='M420 100V20H432V8H444V20H456V8H468V20H480V8H492V20H504V100Z'/%3E%3Crect x='455' y='40' width='10' height='14' fill='%23ffb040'/%3E%3Cpath d='M700 100V54H770V100Z'/%3E%3Cpath d='M720 54V30Q735 14 750 30V54Z'/%3E%3Cpath d='M735 14V2' stroke='%231c1030' stroke-width='3'/%3E%3Cpath d='M300 100Q306 60 300 30Q296 60 290 66Q300 60 300 100Z M860 100Q866 62 860 36Q856 62 850 68Q860 62 860 100Z'/%3E%3C/g%3E%3C/svg%3E")}
+.dust{position:absolute;width:4px;height:4px;border-radius:50%;background:#ffe2a0;opacity:0;animation:rise linear infinite}
+@keyframes rise{0%{opacity:0;transform:translateY(0)}15%{opacity:.8}100%{opacity:0;transform:translateY(-60vh) translateX(40px)}}
+.vig{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 45%,transparent 45%,rgba(6,4,16,.75) 100%)}
+
+.home{position:relative;z-index:1;height:100%;display:grid;grid-template-rows:auto 1fr auto;align-items:center;justify-items:center;padding:3vh 16px 2vh;gap:1vh}
+.hero-head{text-align:center}
+.hero-head .tag{margin-top:6px}
+.stage{width:min(760px,100%);height:min(30vh,240px);position:relative}
+.stage canvas{width:100%;height:100%;display:block}
+.menu{display:flex;flex-direction:column;gap:18px;align-items:stretch;width:min(420px,100%)}
+.menu .two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.menu .three{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.menu .three .btn{flex-direction:column;gap:0;min-height:72px;font-size:16px;padding:6px 8px}
+.menu .three .btn .ico{font-size:24px;line-height:1.1}
+.foot{font-size:13px;color:rgba(255,255,255,.55);display:flex;gap:14px;align-items:center}
+.foot .key{height:24px;min-width:24px;font-size:12px}
+.corner{position:fixed;top:14px;left:14px;z-index:2}
+@media (max-height:620px){.stage{height:22vh}.logo{font-size:52px}.menu{gap:12px}}
+@media (max-width:640px){.menu .three .btn{font-size:14px}.logo .sw{display:none}.logo{font-size:12vw}.corner{display:none}}
+</style>
+</head>
+<body data-home="1">
+<div class="scene" aria-hidden="true">
+  <div class="stars"></div><div class="sun"></div>
+  <div class="layer l1"></div><div class="layer l2"></div><div class="layer l3"></div>
+  <div id="dust"></div>
+  <div class="vig"></div>
+</div>
+<button class="btn dark small icon corner" id="fs" title="شاشة كاملة" aria-label="شاشة كاملة">⛶</button>
+<main class="home fade-in">
+  <header class="hero-head">
+    <h1 class="logo"><span class="sw">⚔</span>فرسان الأطلس<span class="sw">⚔</span></h1>
+    <div class="tag"><span class="ribbon">مغامرة الحروف ضد جيش الظلام</span></div>
+  </header>
+  <div class="stage"><canvas id="stage" aria-label="الحروف ديالك"></canvas></div>
+  <nav class="menu" aria-label="القائمة">
+    <a class="btn big glow" href="game.html?mode=0" id="play"><span class="ico">▶</span> العب</a>
+    <a class="btn blue" href="game.html?mode=1"><span class="ico">👥</span> العب مع صاحبك</a>
+    <div class="three">
+      <a class="btn dark" href="letters.html"><span class="ico">📜</span>الحروف</a>
+      <a class="btn dark" href="howto.html"><span class="ico">🎮</span>كيفاش تلعب</a>
+      <a class="btn dark" href="settings.html"><span class="ico">⚙</span>الإعدادات</a>
+    </div>
+  </nav>
+  <footer class="foot"><span><span class="key wide">Enter</span> باش تلعب</span><span>•</span><span>النسخة 1.0</span></footer>
+</main>
+<script src="js/core.js?v=3"></script>
+<script src="js/data.js?v=3"></script>
+<script src="js/letters.js?v=3"></script>
+<script src="js/site.js?v=3"></script>
+<script>
+'use strict';
+/* home stage: your letters marching in place */
+(function(){
+  const cv=document.getElementById('stage'),n=FOUND_LIST.length;
+  const P=portrait(cv,FOUND_LIST[0],{auto:true});
+  // draw the whole team on one canvas
+  drawPortraits=function(){
+    const [w,h,d]=sizePortrait(P);if(!w)return;
+    ctx=P.g;ctx.setTransform(d,0,0,d,0,0);ctx.clearRect(0,0,w,h);ctx.direction='rtl';
+    const sc=Math.min(h*0.8/120,1.25),gap=Math.min(150*sc,w/(n+0.4));
+    for(let k=0;k<n;k++){
+      const i=FOUND_LIST[k],x=w/2+((n-1)/2-k)*gap,by=h-14,bob=Math.abs(Math.sin(frame*0.08+k))*6;
+      ctx.fillStyle='rgba(0,0,0,.35)';ell(x,by,34*sc,9*sc);ctx.fill();
+      const t=(frame+k*40)%180,atk=t<16?t/16:-1;
+      drawLetter({i,x,y:by-bob,face:1,sc:sc*0.92,walk:frame*0.2,moving:true,atk,flash:false,spinP:-1,cast:-1,hurt:0});
+    }
+  };
+})();
+// floating dust
+(function(){const box=document.getElementById('dust');for(let k=0;k<22;k++){const s=document.createElement('i');s.className='dust';
+  s.style.left=(Math.random()*100)+'%';s.style.bottom=(Math.random()*30)+'%';s.style.animationDuration=(6+Math.random()*8)+'s';s.style.animationDelay=(-Math.random()*10)+'s';box.appendChild(s);}})();
+document.getElementById('fs').onclick=()=>{try{if(!document.fullscreenElement)document.documentElement.requestFullscreen();else document.exitFullscreen();}catch(e){}};
+addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.target.closest('a,button'))go('game.html?mode=0');});
+document.getElementById('play').focus({preventScroll:true});
+</script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+# old character sprite work, not used by the game anymore
+assets/refs/
+assets/sprites/
+assets/start_frames/
+assets/videos/
+tools/
+__pycache__/

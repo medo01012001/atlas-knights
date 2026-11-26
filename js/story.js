@@ -40,8 +40,10 @@ function storyIntro(){
 }
 function storyMeet(i,k,place){
   const b=BEATS[Math.min(k,BEATS.length)-1];
-  return withImg([{w:'n',text:'ف'+place+'، لقيتي حرف محبوس فقفص ديال الظلام... ضربتي القفل حتى تهرّس!'},{w:i,text:MEET[i]}].concat(b?b(i):[]),'cage');
+  return withImg([{w:'n',text:'ف'+place+'، لقيتي حرف محبوس فقفص ديال الظلام... ضربتي القفل حتى تهرّس!'},{w:i,text:MEET[i]}].concat(b?b(i):[]),cageImg(place));
 }
+/* each land has its own picture of the broken cage (assets/story/cage_<stage>.jpg); the old shared one is the fallback */
+function cageImg(place){const n=typeof COUNTRY!=='undefined'?COUNTRY.findIndex(c=>c.c===place):-1;return n>=0?'cage_'+n:'cage';}
 function storyGate(){
   return withImg([
     {w:'n',text:'قلعة الظلام... اللخر ديال الطريق. السما كحلة والريح باردة.'},

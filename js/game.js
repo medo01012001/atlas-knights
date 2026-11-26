@@ -62,6 +62,7 @@ function pollPads(){
     }
     padState[i]=s;
   }
+  if((!AC||AC.state!=='running')&&padState.some(s=>s&&Object.values(s).some(Boolean)))initAudio(); // gamepad players never press a key
 }
 const padTap=(p,b)=>!!(padState[p][b]&&!padPrev[p][b]);
 const held=(p,b)=>CTRL[p][b].some(c=>keys[c])||!!padState[p][b];
@@ -72,7 +73,12 @@ try{if(navigator.keyboard&&navigator.keyboard.getLayoutMap)navigator.keyboard.ge
 
 /* ================= AUDIO ================= */
 let AC=null;
-function initAudio(){if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)();}catch(e){}}}
+/* the browser only lets sound start after the player touches something, and it may pause it later
+   (gamepad-only play, phones, switching windows) — so every input tries to wake it up again */
+function initAudio(){if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)();}catch(e){}}
+  if(AC&&AC.state!=='running'&&AC.resume)try{AC.resume().catch(()=>{});}catch(e){}}
+for(const ev of ['pointerdown','touchend','mousedown','keydown'])addEventListener(ev,()=>initAudio(),{capture:true,passive:true});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')initAudio();});
 function beep(f,d,type,v,slide){if(!AC||SET.vol<=0)return;v=(v||0.05)*SET.vol;const t=AC.currentTime,o=AC.createOscillator(),g=AC.createGain();o.type=type||'square';o.frequency.setValueAtTime(f,t);if(slide)o.frequency.exponentialRampToValueAtTime(Math.max(30,f+slide),t+d);g.gain.setValueAtTime(v||0.05,t);g.gain.exponentialRampToValueAtTime(0.0001,t+d);o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+d);}
 function noise(d,v){if(!AC||SET.vol<=0)return;v=(v||0.08)*SET.vol;const n=Math.floor(AC.sampleRate*d),b=AC.createBuffer(1,n,AC.sampleRate),a=b.getChannelData(0);for(let i=0;i<n;i++)a[i]=(Math.random()*2-1)*(1-i/n);const s=AC.createBufferSource(),g=AC.createGain();s.buffer=b;g.gain.value=v||0.08;s.connect(g);g.connect(AC.destination);s.start();}
 const SFX={
@@ -94,17 +100,17 @@ const ED={
   darcher:{hp:48,spd:1.5,dmg:10,range:360,atkCd:110,gold:6,ranged:true,look:{sc:.95,body:'#4b2a5a',dark:'#2a1833',skin:'#9a8aa8',head:'dhood',weapon:'bow'}}
 };
 const LV=[
-  {name:'المرحلة 1: المغرب',bg:0,types:['goblin','goblin','goblin','skeleton'],boss:'ملك الغيلان',blook:{body:'#5a3a20',dark:'#3a2410',skin:'#6fa040',weapon:'club'}},
-  {name:'المرحلة 2: الجزائر',bg:1,types:['goblin','skeleton','darcher','skeleton'],boss:'عملاق الرمال',blook:{body:'#8a4b22',dark:'#4a2810',skin:'#c9a26a',weapon:'hammer'}},
-  {name:'المرحلة 3: تونس',bg:5,types:['skeleton','orc','darcher','goblin'],boss:'حارس الأسوار',blook:{body:'#2a4a6a',dark:'#16283a',skin:'#a0b8c8',weapon:'sword',cape:'#1f6f8b'}},
-  {name:'المرحلة 4: ليبيا',bg:3,types:['skeleton','orc','darcher','orc','goblin'],boss:'سيد الكهف',blook:{body:'#3a2d4a',dark:'#1f1828',skin:'#7d6a8f',weapon:'hammer'}},
-  {name:'المرحلة 5: مصر',bg:6,types:['skeleton','darcher','orc','goblin','darcher'],boss:'جني الواحة',blook:{body:'#1f5a5a',dark:'#0f3030',skin:'#7fd0c0',weapon:'axe'}},
-  {name:'المرحلة 6: لبنان',bg:2,types:['orc','darcher','skeleton','goblin','orc'],boss:'غول الثلج',blook:{body:'#5f7f9a',dark:'#33475a',skin:'#cfe3ef',weapon:'axe'}},
-  {name:'المرحلة 7: سوريا',bg:9,types:['skeleton','goblin','darcher','orc','goblin'],boss:'تاجر الظلام',blook:{body:'#5a2a5a',dark:'#2e142e',skin:'#b08aa0',weapon:'axe',cape:'#3a103a'}},
-  {name:'المرحلة 8: العراق',bg:7,types:['darcher','skeleton','orc','darcher','goblin'],boss:'العملاق الأزرق',blook:{body:'#2a5aa0',dark:'#163060',skin:'#9fc8f0',weapon:'hammer'}},
-  {name:'المرحلة 9: عُمان',bg:8,types:['goblin','orc','skeleton','darcher','orc'],boss:'قرصان البحر',blook:{body:'#203a4a',dark:'#101e28',skin:'#c9a27a',weapon:'sword',cape:'#8a1a1a'}},
-  {name:'المرحلة 10: اليمن',bg:10,types:['orc','darcher','orc','skeleton','darcher'],boss:'غول النار',blook:{body:'#5a1a0a',dark:'#2a0a04',skin:'#ff7a3a',weapon:'axe'}},
-  {name:'المرحلة 11: الربع الخالي',bg:4,types:['orc','darcher','skeleton','orc','darcher'],boss:'سيد الظلام',blook:{body:'#1a1020',dark:'#0a0610',skin:'#7a2a2a',weapon:'sword',cape:'#600'}}
+  {name:'المرحلة 1: المغرب',bg:0,types:['goblin','snake','goblin','skeleton','snake'],boss:'ملك الغيلان',blook:{body:'#5a3a20',dark:'#3a2410',skin:'#6fa040',weapon:'club'}},
+  {name:'المرحلة 2: الجزائر',bg:1,types:['goblin','skeleton','scorpion','darcher','snake'],boss:'عملاق الرمال',blook:{body:'#8a4b22',dark:'#4a2810',skin:'#c9a26a',weapon:'hammer'}},
+  {name:'المرحلة 3: تونس',bg:5,types:['snake','skeleton','bat','darcher','scorpion'],boss:'حارس الأسوار',blook:{body:'#2a4a6a',dark:'#16283a',skin:'#a0b8c8',weapon:'sword',cape:'#1f6f8b'}},
+  {name:'المرحلة 4: ليبيا',bg:3,types:['scorpion','skeleton','orc','bat','darcher'],boss:'سيد الكهف',blook:{body:'#3a2d4a',dark:'#1f1828',skin:'#7d6a8f',weapon:'hammer'}},
+  {name:'المرحلة 5: مصر',bg:6,types:['croc','scorpion','darcher','snake','orc'],boss:'جني الواحة',blook:{body:'#1f5a5a',dark:'#0f3030',skin:'#7fd0c0',weapon:'axe'}},
+  {name:'المرحلة 6: لبنان',bg:2,types:['bat','orc','eagle','skeleton','eagle'],boss:'غول الثلج',blook:{body:'#5f7f9a',dark:'#33475a',skin:'#cfe3ef',weapon:'axe'}},
+  {name:'المرحلة 7: سوريا',bg:9,types:['eagle','croc','darcher','orc','scorpion'],boss:'تاجر الظلام',blook:{body:'#5a2a5a',dark:'#2e142e',skin:'#b08aa0',weapon:'axe',cape:'#3a103a'}},
+  {name:'المرحلة 8: العراق',bg:7,types:['croc','dragon','orc','eagle','darcher'],boss:'العملاق الأزرق',blook:{body:'#2a5aa0',dark:'#163060',skin:'#9fc8f0',weapon:'hammer'}},
+  {name:'المرحلة 9: عُمان',bg:8,types:['eagle','croc','dragon','golem','bat'],boss:'قرصان البحر',blook:{body:'#203a4a',dark:'#101e28',skin:'#c9a27a',weapon:'sword',cape:'#8a1a1a'}},
+  {name:'المرحلة 10: اليمن',bg:10,types:['dragon','golem','orc','scorpion','eagle'],boss:'غول النار',blook:{body:'#5a1a0a',dark:'#2a0a04',skin:'#ff7a3a',weapon:'axe'}},
+  {name:'المرحلة 11: الربع الخالي',bg:4,types:['dragon','golem','croc','eagle','darcher'],boss:'سيد الظلام',blook:{body:'#1a1020',dark:'#0a0610',skin:'#7a2a2a',weapon:'sword',cape:'#600'}}
 ];
 
 /* ================= STATE ================= */
@@ -136,7 +142,7 @@ function makeHero(i,ctrl){
 }
 function startGame(){startStage(menu.sel);}
 function startLevel(n){
-  Object.assign(G,{level:n,cam:0,enemies:[],proj:[],fx:[],pick:[],zones:[],texts:[],cps:[700,1500,2300,3100],bossX:3900,end:4400,
+  Object.assign(G,{level:n,cam:0,enemies:[],proj:[],fx:[],pick:[],zones:[],texts:[],cps:[520,1040,1560,2080],bossX:2600,end:3100,readyT:0,fightT:0,
     cpi:0,lock:null,queue:[],spawnT:0,boss:null,bossDone:false,doneT:0,goT:0,overT:0,paused:false,banner:{t:200,s:LV[n].name}});
   let joined=null;
   if(n>0&&n%JOIN_EVERY===0&&!PROG.joins[n]){ // a new letter appears every JOIN_EVERY levels
@@ -177,8 +183,10 @@ function genWave(n,w){
   return q;
 }
 function makeEnemy(type,x,y){
-  const d=ED[type],m=(1+0.22*G.level)*DIFF().hp;
-  return {kind:'enemy',type,d,look:d.look,x,y,z:0,vz:0,hp:d.hp*m,maxHp:d.hp*m,dmg:d.dmg*(1+0.15*G.level)*DIFF().dmg,face:-1,
+  /* every land is tougher: more health, harder hits, faster and quicker to strike — and from the 3rd land some golden elites */
+  const n=G.level,d=ED[type],elite=n>=2&&Math.random()<0.04+0.025*n,m=(1+0.26*n)*DIFF().hp*(elite?1.8:1);
+  const look=elite?Object.assign({},d.look,{sc:d.look.sc*1.18}):d.look;
+  return {kind:'enemy',type,d,look,elite,spdM:1+0.03*n,cdM:Math.max(0.6,1-0.035*n),x,y,z:0,vz:0,hp:d.hp*m,maxHp:d.hp*m,dmg:d.dmg*(1+0.17*n)*DIFF().dmg*(elite?1.3:1),face:-1,
     cd:rnd(30,80),wind:0,stun:0,slow:0,kx:0,flash:0,walk:0,moving:false,atkT:0,atkMax:1,spdJ:rnd(0.85,1.15),offY:rnd(-20,20),dead:false};
 }
 function spawnEnemy(type){
@@ -187,7 +195,7 @@ function spawnEnemy(type){
   G.enemies.push(makeEnemy(type,x,rnd(FT+10,FB-10)));
 }
 function spawnBoss(){
-  const n=G.level,L=LV[n],m=(1+0.35*n)*(0.4+0.12*G.heroes.length)*DIFF().hp;
+  const n=G.level,L=LV[n],m=(1+0.42*n)*(0.4+0.12*G.heroes.length)*DIFF().hp;
   const look=Object.assign({sc:2.0,head:'boss'},L.blook);
   const b={kind:'enemy',type:'boss',isBoss:true,name:L.boss,d:{spd:1.3+0.12*n,range:95,gold:0},look,
     x:G.bossX+380,y:(FT+FB)/2,z:0,vz:0,hp:1400*m,maxHp:1400*m,dmg:14*(1+0.18*n)*DIFF().dmg,face:-1,cd:0,wind:0,stun:0,slow:0,kx:0,flash:0,
@@ -213,8 +221,8 @@ function hurtEnemy(e,dmg,dir,kb){
 }
 function killEnemy(e){
   e.dead=true;TUT.kills++;
-  const n=e.isBoss?30:e.d.gold;
-  for(let i=0;i<n;i++)G.pick.push({type:'coin',x:e.x,y:e.y,z:20,vz:rnd(3,8),vx:rnd(-3.5,3.5),val:2+G.level,t:0});
+  const n=e.isBoss?5:e.elite?2:Math.random()<0.25?1:0; // only a coin now and then: the real reward comes when the stage is won
+  for(let i=0;i<n;i++)G.pick.push({type:'coin',x:e.x,y:e.y,z:20,vz:rnd(3,8),vx:rnd(-3.5,3.5),val:1,t:0});
   if(!e.isBoss&&Math.random()<0.07)G.pick.push({type:'heart',x:e.x,y:e.y,z:20,vz:5,vx:0,t:0});
   part(e.x,e.y,30,e.type==='skeleton'?'#e8e3d0':'#8a1a1a',12,3.5,5,35);
   if(e.isBoss){
@@ -433,7 +441,8 @@ function updHero(h){
     meleeHit(h,45,32,hDmg(h)*2.5*hPow(h),7,0,h.dashSet);
     if(frame%2===0)part(h.x-h.face*10,h.y,40,'#9fd0ff',2,1,5,15);
   }else{
-    const sp=hSpd(h)*(h.atkT>0&&h.def.type==='melee'?0.35:1)*(h.buffT>0?1.15:1);
+    const sp=hSpd(h)*(h.atkT>0&&h.def.type==='melee'?0.35:1)*(h.buffT>0?1.15:1)*(G.lock===null&&!G.enemies.length?1.3:1);
+    if(G.readyT>0){inp.a=inp.k=inp.l=false;}
     let mx=inp.mx,my=inp.my;if(mx&&my){mx*=0.75;my*=0.75;}
     h.x+=mx*sp;h.y+=my*sp*0.75;
     if(inp.mx)h.face=inp.mx>0?1:-1;
@@ -454,7 +463,7 @@ function nearestHero(e){
 }
 function enemyStrike(e){
   e.atkT=12;e.atkMax=12;
-  if(e.d.ranged){SFX.arrow();G.proj.push({type:'earrow',own:0,x:e.x+e.face*18,y:e.y,z:44,vx:e.face*7,vy:0,dmg:e.dmg,life:130,r:8});return;}
+  if(e.d.ranged){const f=e.d.proj==='efire';f?SFX.fire():SFX.arrow();G.proj.push({type:f?'efire':'earrow',own:0,x:e.x+e.face*(f?34:18),y:e.y,z:f?96:44,vx:e.face*(f?6:7),vy:0,dmg:e.dmg,life:130,r:f?12:8});return;}
   SFX.swing();
   for(const h of G.heroes){if(h.down)continue;const dx=(h.x-e.x)*e.face;if(dx>-10&&dx<e.d.range+12&&Math.abs(h.y-e.y)<28)hurtHero(h,e.dmg,e.face);}
 }
@@ -466,9 +475,9 @@ function updEnemy(e){
   if(e.slow>0){e.slow--;if(frame%10===0)part(e.x,e.y,50,'#bff4ff',1,0.5,3,20);}
   if(e.burn>0){e.burn--;if(frame%4===0)part(e.x,e.y,45,'#ff8a20',1,0.6,4,18);if(e.burn%25===0){hurtEnemy(e,e.burnD,0,0);if(e.dead)return;}}
   if(e.stun>0){e.stun--;return;}
-  if(e.isBoss){updBoss(e);return;}
+  if(e.isBoss){if(G.readyT>0){const tx=G.lock+W*0.22;e.face=-1;if(Math.abs(e.x-tx)>4){e.x+=Math.sign(tx-e.x)*2.2;e.moving=true;e.walk+=0.12;}return;}updBoss(e);return;}
   const t=nearestHero(e);if(!t)return;
-  const sp=e.d.spd*e.spdJ*(e.slow>0?0.45:1);
+  const sp=e.d.spd*e.spdJ*(e.spdM||1)*(e.slow>0?0.45:1);
   e.cd--;
   if(e.wind>0){e.wind--;if(e.wind===0)enemyStrike(e);return;}
   const dx=t.x-e.x,dy=t.y-e.y;
@@ -478,9 +487,9 @@ function updEnemy(e){
     const adx=Math.abs(dx);
     if(adx<200)mx=-Math.sign(dx);else if(adx>320)mx=Math.sign(dx);
     if(Math.abs(dy)>8)my=Math.sign(dy);
-    if(Math.abs(dy)<30&&adx<e.d.range&&e.cd<=0){e.wind=28;e.cd=e.d.atkCd;}
+    if(Math.abs(dy)<30&&adx<e.d.range&&e.cd<=0&&!G.readyT){e.wind=28;e.cd=e.d.atkCd*(e.cdM||1);}
   }else{
-    if(Math.abs(dx)<e.d.range&&Math.abs(dy)<22){if(e.cd<=0){e.wind=24;e.cd=e.d.atkCd;}}
+    if(Math.abs(dx)<e.d.range&&Math.abs(dy)<22){if(e.cd<=0&&!G.readyT){e.wind=24;e.cd=e.d.atkCd*(e.cdM||1);}}
     else{
       const tx=t.x-Math.sign(dx||1)*e.d.range*0.7,ty=t.y+e.offY*0.3;
       if(Math.abs(tx-e.x)>4)mx=Math.sign(tx-e.x);
@@ -538,7 +547,7 @@ function updBoss(b){
       break;
     case 'summon':
       if(--b.bt<=0){
-        for(let i=0;i<3;i++){const e=makeEnemy(G.level>=4?'orc':'skeleton',clamp(b.x+rnd(-140,140),G.cam+40,G.cam+W-40),rnd(FT+10,FB-10));G.enemies.push(e);part(e.x,e.y,20,'#b070ff',12,3,5,30);}
+        for(let i=0;i<3;i++){const e=makeEnemy(LV[G.level].types[i%LV[G.level].types.length],clamp(b.x+rnd(-140,140),G.cam+40,G.cam+W-40),rnd(FT+10,FB-10));G.enemies.push(e);part(e.x,e.y,20,'#b070ff',12,3,5,30);}
         SFX.skill();b.bs='rest';b.bt=40;b.acd=rnd(130,180);
       }
       break;
@@ -636,10 +645,13 @@ function updPlay(){
   const hs=humans(),act=hs.length?hs:aliveHeroes();
   const maxX=act.length?Math.max(...act.map(h=>h.x)):G.cam+W/2;
   if(G.lock===null){
-    if(G.cpi<G.cps.length&&maxX>G.cps[G.cpi]-150){G.lock=G.cps[G.cpi];G.queue=genWave(G.level,G.cpi);G.cpi++;G.spawnT=30;}
-    else if(G.cpi>=G.cps.length&&!G.boss&&maxX>G.bossX-150){G.lock=G.bossX;G.queue=[];spawnBoss();}
+    if(G.cpi<G.cps.length&&maxX>G.cps[G.cpi]-150){G.lock=G.cps[G.cpi];G.queue=genWave(G.level,G.cpi);G.cpi++;G.spawnT=10;G.readyT=120;G.intro=waveIntro(G.queue);if(G.intro){G.readyT=230;G.banner.t=0;}}
+    else if(G.cpi>=G.cps.length&&!G.boss&&maxX>G.bossX-150){G.lock=G.bossX;G.queue=[];spawnBoss();G.readyT=130;}
   }
-  if(G.queue.length){if(--G.spawnT<=0&&G.enemies.length<6+G.level){spawnEnemy(G.queue.shift());G.spawnT=35;}}
+  if(G.queue.length){if(--G.spawnT<=0&&G.enemies.length<6+G.level){spawnEnemy(G.queue.shift());G.spawnT=G.readyT>0?8:35;}}
+  if(G.readyT>0&&--G.readyT===0){G.fightT=50;SFX.skill();G.shake=Math.max(G.shake,4);} // ⚔ fight!
+  if(G.fightT>0)G.fightT--;
+  if(!G.readyT)G.intro=null;
   if(G.lock!==null&&!G.queue.length&&!G.enemies.length){
     if(G.boss){if(G.bossDone&&!G.doneT){G.doneT=1;}}
     else{
@@ -677,7 +689,7 @@ function updPlay(){
 
 /* ================= MENU / SHOP / END ================= */
 function goHome(){location.href='index.html';}
-function upCost(lv){return 8+lv*5+Math.floor(lv*lv/5);}
+function upCost(lv){return Math.round(12*Math.pow(1.25,lv));} // each level costs a quarter more than the last: 12, 15, 19 ... 833
 function shopBuy(c,r){
   const key=UPK[r],u=upg[G.roster[c].idx],lv=u[key];
   if(lv>=UPMAX||gold<upCost(lv)){SFX.no();}else{gold-=upCost(lv);u[key]++;SFX.buy();saveProg();}
@@ -822,8 +834,11 @@ function drawEnemy(e){
     if(e.hp<e.maxHp/2){ctx.fillStyle='rgba(255,40,20,'+(0.15+0.1*Math.sin(frame*0.2))+')';ell(sx,e.y,60,20);ctx.fill();}
   }
   const wind=e.wind>0||(e.isBoss&&(e.bs==='slam'||e.bs==='orbs'||e.bs==='summon'||e.bs==='charge'));
-  drawChar(Object.assign({},L,{x:sx,y:sy,face:e.face,walk:e.walk,moving:e.moving,atk:e.atkT>0?1-e.atkT/e.atkMax:-1,wind,flash:e.flash>0}));
-  const top=sy-80*L.sc-(e.isBoss?20:0);
+  if(e.elite&&!L.beast){ctx.strokeStyle='rgba(255,210,74,'+(0.5+0.3*Math.sin(frame*0.15))+')';ctx.lineWidth=2;ell(sx,e.y,22*L.sc,8*L.sc);ctx.stroke();}
+  if(L.beast)drawBeast(e,sx,sy);
+  else drawChar(Object.assign({},L,{x:sx,y:sy,face:e.face,walk:e.walk,moving:e.moving,atk:e.atkT>0?1-e.atkT/e.atkMax:-1,wind,flash:e.flash>0}));
+  const top=sy-(L.h||80)*L.sc-(e.isBoss?20:0)-(L.beast?beastHover(e):0);
+  if(e.elite)txt('★',sx,top-14,13,'#ffd24a');
   if(e.stun>0){for(let i=0;i<3;i++){const a=frame*0.15+i*2.1;txt('★',sx+Math.cos(a)*14,top+2+Math.sin(a)*4,12,'#ffe066','center',false);}}
   if(e.wind>0&&!e.isBoss)txt('!',sx,top-4,18,'#ff4040');
   if(!e.isBoss&&e.hp<e.maxHp){ctx.fillStyle='rgba(0,0,0,.6)';ctx.fillRect(sx-16,top+8,32,4);ctx.fillStyle='#ff5040';ctx.fillRect(sx-16,top+8,32*Math.max(0,e.hp/e.maxHp),4);}
@@ -843,6 +858,7 @@ function drawProj(p){
     ctx.fillStyle=p.type==='earrow'?'#d040ff':'#ddd';tri(10,-4,17,0,10,4);ctx.fillStyle='#fff';ctx.fillRect(-15,-3,4,6);ctx.restore();
   }else if(p.type==='fire'){
     ctx.fillStyle='rgba(255,140,40,.35)';circ(sx,sy,15);ctx.fillStyle='#ff8a20';circ(sx,sy,9);ctx.fillStyle='#ffe080';circ(sx+d*2,sy,5);
+  }else if(p.type==='efire'){drawEfire(p,sx,sy);
   }else if(p.type==='orb'){
     ctx.fillStyle='rgba(190,60,255,.35)';circ(sx,sy,16);ctx.fillStyle='#9a20e0';circ(sx,sy,10);ctx.fillStyle='#f0c0ff';circ(sx,sy,4);
   }
@@ -985,7 +1001,7 @@ function drawPlay(){
 function update(){
   pollPads();
   if(window.LOADER&&LOADER.on){for(const k in pressed)delete pressed[k];frame++;return;} // no input behind the loading screen
-  if(gateTick()){try{ambTick();}catch(e){}for(const k in pressed)delete pressed[k];frame++;return;} // the door between scenes
+  if(gateTick()||sndTick()){try{ambTick();}catch(e){}for(const k in pressed)delete pressed[k];frame++;return;} // the door between scenes
   for(let p=0;p<2;p++){
     if(padTap(p,'start')){if(state==='play')pressed.Escape=true;else pressed.Enter=true;}
     if(padTap(p,'back')){if(state==='play'&&G.paused)pressed.Backspace=true;else pressed.Escape=true;}
@@ -1013,7 +1029,11 @@ function draw(){
   else if(state==='story')drawStory();
   else drawWin();
   if(state==='play'||state==='shop')drawTut();
-  if(GATE.on)drawGate();
+  const gateOn=typeof GATE!=='undefined'&&GATE.on; // gate.js loads last
+  if(!gateOn&&!SNDUI.open){ // the gear that opens the sound window
+    if(state==='menu')gearBtn(118,10);else if(state==='play'&&!G.paused)gearBtn(12,108);else if(state==='shop')gearBtn(14,11);}
+  drawSndUI();
+  if(gateOn)drawGate();
 }
 let last=performance.now(),acc=0;
 function loop(now){

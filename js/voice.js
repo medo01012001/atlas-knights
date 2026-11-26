@@ -118,26 +118,31 @@ function drawTut(){
   ctx.restore();
 }
 
-/* ---------- nature sounds ---------- */
-const AMB={g:null,wind:null,wf:null,sea:null,sf:null,theme:'',next:0,t:0};
+/* ---------- nature sounds ----------
+   No wind any more: each land has its own sound — birds singing in the green places, rain in the snowy
+   mountains, the crackle and rumble of fire at the volcano, waves and gulls by the sea, drips in the cave,
+   crickets at the night oasis. All soft, under the game, and they follow the volume and the 🌿 switch. */
+const AMB={g:null,layers:{},theme:'',next:0,t:0};
 function ambInit(){
   if(AMB.g||!AC)return;
   try{
-    const len=AC.sampleRate*3,buf=AC.createBuffer(1,len,AC.sampleRate),d=buf.getChannelData(0);
-    let last=0;for(let i=0;i<len;i++){const w=Math.random()*2-1;last=(last+0.02*w)/1.02;d[i]=last*3.5;} // brown noise: soft and deep
-    const src=()=>{const s=AC.createBufferSource();s.buffer=buf;s.loop=true;s.start(0,Math.random()*2);return s;};
+    const len=AC.sampleRate*3,mk=f=>{const b=AC.createBuffer(1,len,AC.sampleRate),d=b.getChannelData(0);f(d);return b;};
+    const brown=mk(d=>{let l=0;for(let i=0;i<len;i++){l=(l+0.02*(Math.random()*2-1))/1.02;d[i]=l*3.5;}});
+    const white=mk(d=>{for(let i=0;i<len;i++)d[i]=Math.random()*2-1;});
     AMB.g=AC.createGain();AMB.g.gain.value=0;AMB.g.connect(AC.destination);
-    AMB.wf=AC.createBiquadFilter();AMB.wf.type='lowpass';AMB.wf.frequency.value=500;AMB.wind=AC.createGain();AMB.wind.gain.value=0;
-    src().connect(AMB.wf);AMB.wf.connect(AMB.wind);AMB.wind.connect(AMB.g);
-    AMB.sf=AC.createBiquadFilter();AMB.sf.type='bandpass';AMB.sf.frequency.value=500;AMB.sf.Q.value=0.6;AMB.sea=AC.createGain();AMB.sea.gain.value=0;
-    src().connect(AMB.sf);AMB.sf.connect(AMB.sea);AMB.sea.connect(AMB.g);
+    const layer=(buf,type,f,q)=>{const s=AC.createBufferSource();s.buffer=buf;s.loop=true;s.start(0,Math.random()*2);
+      const fl=AC.createBiquadFilter();fl.type=type;fl.frequency.value=f;fl.Q.value=q||0.7;const g=AC.createGain();g.gain.value=0;
+      s.connect(fl);fl.connect(g);g.connect(AMB.g);return {f:fl,g};};
+    AMB.layers.sea=layer(brown,'bandpass',500,0.6);
+    AMB.layers.rain=layer(white,'bandpass',2600,0.5);
+    AMB.layers.fire=layer(brown,'lowpass',260);
   }catch(e){AMB.g=null;}
 }
-/* per place: wind level & tone, sea, and little details (birds, crickets, drips, crackles) */
+/* bg number -> what you hear there (0 forest, 1 desert, 2 snow, 3 cave, 4 empty quarter, 5 medina, 6 night oasis, 7 blue city, 8 sea, 9 market, 10 volcano) */
 const AMBT={
-  map:{w:0.5,f:420,birds:0.5},story:{w:0.45,f:360},win:{w:0.3,f:500,birds:1},
-  0:{w:0.45,f:520,birds:1},1:{w:0.8,f:750,gust:1},2:{w:0.9,f:420,gust:1},3:{w:0.35,f:220,drips:1},4:{w:0.75,f:260,gust:1},
-  5:{w:0.4,f:560,birds:0.6},6:{w:0.35,f:400,crickets:1},7:{w:0.4,f:600,birds:0.7},8:{w:0.35,f:500,sea:1,gulls:1},9:{w:0.35,f:600,birds:0.4},10:{w:0.5,f:180,crackle:1}
+  map:{birds:0.6},story:{birds:0.4},win:{birds:1},
+  0:{birds:1,forest:1},1:{hawk:1},2:{rain:1},3:{drips:1},4:{hawk:0.5},
+  5:{birds:0.5},6:{crickets:1},7:{birds:0.7},8:{sea:1,gulls:1},9:{birds:0.4},10:{fire:1}
 };
 function ambTheme(){
   if(state==='menu')return 'map';
@@ -147,22 +152,85 @@ function ambTheme(){
 }
 function ambTick(){
   if(!AC)return;ambInit();if(!AMB.g)return;
-  const T=AC.currentTime,th=ambTheme(),P=AMBT[th]||AMBT.map,on=SET.amb?1:0,quiet=(state==='play'&&G&&G.paused)?0.5:1;
+  const T=AC.currentTime,th=ambTheme(),P=AMBT[th]||AMBT.map,on=SET.amb?1:0,quiet=(state==='play'&&G&&G.paused)||SNDUI.open?0.5:1,Ly=AMB.layers;
   AMB.g.gain.setTargetAtTime(0.16*SET.vol*on*quiet,T,0.6);
-  if(th!==AMB.theme){AMB.theme=th;AMB.wf.frequency.setTargetAtTime(P.f,T,1);AMB.sea.gain.setTargetAtTime(P.sea?0.5:0,T,1.5);}
-  if(++AMB.t%40===0){ // the wind breathes: slow random swells, and gusts in the open places
-    const g=P.w*(0.55+Math.random()*0.45)*(P.gust&&Math.random()<0.15?1.7:1);
-    AMB.wind.gain.setTargetAtTime(g,T,1.2);
-    if(P.sea)AMB.sf.frequency.setTargetAtTime(350+Math.random()*450,T,1.6),AMB.sea.gain.setTargetAtTime(0.25+0.45*(0.5+0.5*Math.sin(T*0.8)),T,1.4);
+  if(th!==AMB.theme){AMB.theme=th;
+    Ly.sea.g.gain.setTargetAtTime(P.sea?0.5:0,T,1.5);Ly.rain.g.gain.setTargetAtTime(P.rain?0.32:0,T,1.5);Ly.fire.g.gain.setTargetAtTime(P.fire?0.9:0,T,1.5);}
+  if(++AMB.t%40===0){
+    if(P.sea){Ly.sea.f.frequency.setTargetAtTime(350+Math.random()*450,T,1.6);Ly.sea.g.gain.setTargetAtTime(0.25+0.45*(0.5+0.5*Math.sin(T*0.8)),T,1.4);}
+    if(P.rain){Ly.rain.g.gain.setTargetAtTime(0.24+Math.random()*0.14,T,2);Ly.rain.f.frequency.setTargetAtTime(2200+Math.random()*900,T,2);}
+    if(P.fire)Ly.fire.g.gain.setTargetAtTime(0.7+Math.random()*0.4,T,0.8);
   }
-  if(!on||frame<AMB.next)return;
-  AMB.next=frame+60+Math.random()*240;
+  if(!on||SET.vol<=0)return;
   const v=0.02*SET.vol;
-  if(P.birds&&Math.random()<P.birds){const f=2200+Math.random()*1800,n=2+(Math.random()*3|0);for(let i=0;i<n;i++)setTimeout(()=>chirp(f*(0.9+Math.random()*0.25),v),i*(90+Math.random()*60));}
+  // quick details that keep going: raindrops and fire crackles
+  if(P.rain&&Math.random()<0.25)chirp(2400+Math.random()*2400,v*0.35,0.02,-900);
+  if(P.fire&&Math.random()<0.12){const n=1+(Math.random()*3|0);for(let i=0;i<n;i++)setTimeout(()=>crackle(v*2.2),i*(30+Math.random()*70));}
+  if(frame<AMB.next)return;
+  AMB.next=frame+(P.forest?35:60)+Math.random()*(P.forest?120:240);
+  if(P.birds&&Math.random()<P.birds)birdSong(v*(P.forest?1.1:0.9));
+  if(P.forest&&Math.random()<0.35)setTimeout(()=>birdSong(v*0.6),300+Math.random()*700); // a second bird answers further away
+  if(P.hawk&&Math.random()<0.18*P.hawk)chirp(1700,v*0.7,0.6,-700);
   if(P.gulls&&Math.random()<0.35)chirp(1400,v*0.8,0.35,-500);
   if(P.crickets){for(let i=0;i<6;i++)setTimeout(()=>beepAmb(4600,0.025,v*0.5),i*55);}
   if(P.drips&&Math.random()<0.6)chirp(900+Math.random()*700,v*1.2,0.08,-400);
-  if(P.crackle){for(let i=0;i<3+(Math.random()*4|0);i++)setTimeout(()=>noise(0.02,v*1.5),i*(40+Math.random()*90));}
+}
+/* a few kinds of little songs so the forest does not repeat itself */
+function birdSong(v){
+  const k=Math.random()*4|0,f=2000+Math.random()*1800;
+  if(k===0){const n=3+(Math.random()*4|0);for(let i=0;i<n;i++)setTimeout(()=>chirp(f*(0.92+Math.random()*0.16),v,0.06),i*70);}            // quick trill
+  else if(k===1){chirp(f*0.8,v,0.22,f*0.5);setTimeout(()=>chirp(f*1.1,v,0.18,-f*0.4),260);}                                          // two-note whistle
+  else if(k===2){for(let i=0;i<2;i++)setTimeout(()=>chirp(f,v,0.09,f*0.3),i*150);setTimeout(()=>chirp(f*1.25,v,0.25,-f*0.6),330);}  // tee-tee-tuu
+  else{const n=5+(Math.random()*4|0);for(let i=0;i<n;i++)setTimeout(()=>chirp(f*(1+i*0.04),v*0.8,0.035,f*0.2),i*45);}                // rising chatter
+}
+/* one dry pop of burning wood */
+function crackle(v){if(!AC||!AMB.g)return;const n=Math.floor(AC.sampleRate*0.015),b=AC.createBuffer(1,n,AC.sampleRate),a=b.getChannelData(0);
+  for(let i=0;i<n;i++)a[i]=(Math.random()*2-1)*Math.pow(1-i/n,3);const s=AC.createBufferSource(),g=AC.createGain(),f=AC.createBiquadFilter();
+  f.type='highpass';f.frequency.value=1200+Math.random()*1500;g.gain.value=v*8;s.buffer=b;s.connect(f);f.connect(g);g.connect(AMB.g);s.start();}
+
+/* ---------- the sound window (gear button) ----------
+   Opens over any screen: volume up/down, mute, story voices on/off, nature sounds on/off. Saved like the settings page. */
+const SNDUI={open:false,row:0};
+function sndOpen(){SNDUI.open=true;SNDUI.row=0;if(state==='play'&&G)G.paused=true;}
+function sndVol(d){SET.vol=clamp(Math.round((SET.vol+d)*10)/10,0,1);if(SET.vol>0)SET.pvol=SET.vol;sndApply();}
+function sndMute(){if(SET.vol>0){SET.pvol=SET.vol;SET.vol=0;}else SET.vol=SET.pvol>0?SET.pvol:0.8;sndApply();}
+function sndApply(){saveSet();if(CLIP.cur)try{CLIP.cur.volume=Math.min(1,SET.vol*1.1);}catch(e){}if(SET.vol<=0||!SET.voice)stopVoice();initAudio();beep(880,0.06,'square',0.04);}
+function sndToggle(k){SET[k]=SET[k]?0:1;sndApply();}
+/* called from update(); while the window is open it takes the keys */
+function sndTick(){
+  if(!SNDUI.open)return false;
+  const up=tap(0,'up')||pressed.ArrowUp,dn=tap(0,'down')||pressed.ArrowDown,lf=tap(0,'left')||pressed.ArrowLeft,rt=tap(0,'right')||pressed.ArrowRight;
+  if(up)SNDUI.row=(SNDUI.row+4)%5;if(dn)SNDUI.row=(SNDUI.row+1)%5;
+  if(SNDUI.row===0&&(lf||rt))sndVol(rt?0.1:-0.1);
+  if(tap(0,'a')||pressed.Enter||pressed.Space){if(SNDUI.row===1)sndMute();else if(SNDUI.row===2)sndToggle('voice');else if(SNDUI.row===3)sndToggle('amb');else if(SNDUI.row===4)SNDUI.open=false;}
+  if(pressed.Escape||padTap(0,'b')||padTap(0,'start'))SNDUI.open=false;
+  return true;
+}
+function gearBtn(x,y){btn(x,y,44,38,SET.vol>0?'⚙':'🔇',sndOpen,'dark',{size:18});}
+function drawSndUI(){
+  if(!SNDUI.open)return;
+  ctx.fillStyle='rgba(8,6,20,.72)';ctx.fillRect(0,0,W,H);hit(0,0,W,H,()=>{});
+  const pw=Math.min(520,W-40),ph=330,px=W/2-pw/2,py=H/2-ph/2;
+  panel(px,py,pw,ph,{frame:FRAMES.gold,r:16});ribbonFit(W/2,py+4,'⚙ الصوت',24,'#2f6fd0',220);
+  const rows=[['🔊','الصوت'],['🔇','كتم الصوت'],['🗣','أصوات الحكاية'],['🌿','أصوات الطبيعة']];
+  rows.forEach(([ic,nm],k)=>{
+    const y=py+50+k*56,sel=SNDUI.row===k,rx=px+20,rw=pw-40;
+    ctx.fillStyle=sel?'rgba(255,210,74,.16)':'rgba(0,0,0,.25)';rp(rx,y,rw,46,10);ctx.fill();if(sel){ctx.strokeStyle='#ffd24a';ctx.lineWidth=2.5;ctx.stroke();}
+    hit(rx,y,rw,46,()=>{SNDUI.row=k;});
+    txt(ic,rx+rw-24,y+24,20,'#fff',false);txt(nm,rx+rw-48,y+24,17,'#fff','right');
+    if(k===0){
+      const bw=Math.min(200,rw-250),bx=rx+60;
+      btn(rx+8,y+7,44,32,'−',()=>{SNDUI.row=0;sndVol(-0.1);},'dark',{size:20});
+      btn(bx+bw+10,y+7,44,32,'+',()=>{SNDUI.row=0;sndVol(0.1);},'gold',{size:20});
+      for(let q=0;q<10;q++){const sx=bx+q*(bw/10);ctx.fillStyle=q<Math.round(SET.vol*10)?vgrad(y+14,y+32,GOLDB):'#3a3450';rp(sx+2,y+14,bw/10-4,18,3);ctx.fill();}
+      txt(Math.round(SET.vol*100)+'%',bx+bw+84,y+24,15,'#ffd24a');
+    }else{
+      const on=k===1?SET.vol<=0:k===2?!!SET.voice:!!SET.amb;
+      btn(rx+8,y+7,120,32,on?'✔ مشعول':'✖ مطفي',()=>{SNDUI.row=k;k===1?sndMute():sndToggle(k===2?'voice':'amb');},on?'green':'dark',{size:15});
+    }
+  });
+  const sel4=SNDUI.row===4;
+  btn(W/2-90,py+ph-58,180,44,'✔ مزيان',()=>{SNDUI.open=false;},sel4?'green':'gold',{size:18,glow:sel4});
 }
 function chirp(f,v,d,slide){if(!AC)return;d=d||0.07;const t=AC.currentTime,o=AC.createOscillator(),g=AC.createGain();o.type='sine';
   o.frequency.setValueAtTime(f,t);o.frequency.exponentialRampToValueAtTime(Math.max(80,f+(slide!=null?slide:f*0.35)),t+d);

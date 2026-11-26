@@ -221,14 +221,20 @@ function drawHUD(){
     if(G.banner.sub&&G.banner.t<200)pill(W/2,H/2-30,G.banner.sub,'#2a8a52',18);
     ctx.globalAlpha=1;
   }
+  // get ready… then fight!
+  if(G.readyT>0&&!G.paused&&G.intro)drawIntro(Math.ceil(G.readyT/40));
+  else if(G.readyT>0&&!G.paused){const k=Math.ceil(G.readyT/40),p=1-(G.readyT%40)/40,sc=1+0.25*(1-Math.min(1,p*3));
+    ctx.save();ctx.translate(W/2,H/2+30);ctx.scale(sc,sc);txt(G.boss&&!G.bossDone?'⚠ استعدو للبوس!':'⚠ استعدو!',0,-34,26,'#ffd24a',INK);txt(''+k,0,22,58,'#ffffff',INK);ctx.restore();}
+  if(G.fightT>0){const a=Math.min(1,G.fightT/20),sc=1+0.6*(1-G.fightT/50);ctx.save();ctx.globalAlpha=a;ctx.translate(W/2,H/2-30);ctx.scale(sc,sc);txt('⚔ قاتلو!',0,0,52,'#ff6a4a',INK);ctx.restore();}
   if(G.paused){
     ctx.fillStyle='rgba(8,6,20,.7)';ctx.fillRect(0,0,W,H);
-    const pw=480,ph=214,px=W/2-pw/2,py=H/2-110;
+    const pw=480,ph=244,px=W/2-pw/2,py=H/2-122;
     panel(px,py,pw,ph);ribbonFit(W/2,py+4,'⏸ واقف',26,'#2f6fd0',220);
     txt(LV[G.level].name,W/2,py+62,16,'#e6e2f4','center',false);
     btn(W/2+10,py+92,200,48,'▶ كمل',()=>{G.paused=false;},'gold');
     btn(W/2-210,py+92,200,48,'🗺 الخريطة',resetMenu,'dark');
-    txt(padCount?'🎮 Start ولا B باش تكمل  —  Select للخريطة':'Esc باش تكمل  —  Backspace للخريطة',W/2,py+180,13,'#bdb8d6','center',false);
+    btn(W/2-60,py+150,120,34,'⚙ الصوت',sndOpen,'dark',{size:14});
+    txt(padCount?'🎮 Start ولا B باش تكمل  —  Select للخريطة':'Esc باش تكمل  —  Backspace للخريطة',W/2,py+210,13,'#bdb8d6','center',false);
   }
 }
 function drawShop(){
@@ -238,7 +244,7 @@ function drawShop(){
   const hr=G.roster[shop.hero],li=hr.idx,D=HEROES[li],L=LET[li],u=upg[li],bench=G.bench.includes(hr),row=shop.row|0;
   // header
   ribbonFit(W/2,30,'⚒ تطوير الحروف',22,'#b8322a',280);
-  coinPill(14,30,gold);
+  coinPill(66,30,gold);
   const fromMap=shop.from==='map';
   if(!fromMap&&G.fact){pill(W-110,22,'✅ ربحتي '+G.fact.c,'#2f8a2a',12);if(G.bonus)pill(W-110,48,'🎁 مكافأة: +'+G.bonus,'#c8800e',11);}
   const top=66,ch=392;

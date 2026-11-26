@@ -63,7 +63,7 @@ function startStage(n){
 function stageCleared(){
   const n=G.level,first=n>=PROG.cleared;
   PROG.cleared=Math.max(PROG.cleared,n+1);
-  if(first){const b=20+n*10;gold+=b;G.bonus=b;}else G.bonus=0;
+  const b=first?25+n*10:8+n*3;gold+=b;G.bonus=b; // the stage's reward: a small purse, less when you play it again
   G.fact=COUNTRY[n];
   saveProg();
   if(n>=LV.length-1){
@@ -188,7 +188,7 @@ function drawMenu(){
   // header
   btn(14,10,44,38,'🏠',goHome,'dark',{size:18});
   btn(66,10,44,38,'⛶',toggleFS,'dark',{size:18});
-  coinPill(122,29,gold);
+  coinPill(174,29,gold);
   ribbonFit(W/2,30,'🗺 رحلة الحروف فبلاد العرب',20,'#b8322a',320);
   pill(W-90,29,'🏆 '+PROG.cleared+' من '+LV.length,'#3a3f78',14);
   const LW=Math.min(270,Math.max(230,W*0.24)),top=62,mh=300;
@@ -224,7 +224,9 @@ function drawMenu(){
   if(open&&n<PROG.cleared)pill(tx+tw_/2,ty+th+34,'✓ تربحات','#2f8a2a',11);
   const ax=tx-14,aw=ax-ix-14;
   txt(C.ico+' '+C.c,ax,by+24,22,'#ffe680','right');
-  txt('👹 البوس: '+L.boss,ax,by+52,13,'#ffb8a8','right',false);
+  const mons=[...new Set(L.types)].slice(0,3).map(t=>ENAME[t]).join('، ');
+  txt('👹 '+L.boss,ax,by+52,13,'#ffb8a8','right',false);
+  txt('🐾 '+mons,ax-tw('👹 '+L.boss,13)-18,by+52,12,'#ffd8a0','right',false);
   if(open){
     txt('💡 واش كتعرف؟',ax,by+76,14,'#7fd6ff','right',false);
     wrapLines(C.fact,aw,13).slice(0,3).forEach((s,k)=>txt(s,ax,by+98+k*19,13,'#eef0ff','right',false));

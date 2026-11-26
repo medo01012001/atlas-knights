@@ -93,6 +93,7 @@ body.leaving{animation:fadeOut .25s ease forwards}
 .btn:hover{filter:brightness(1.1);transform:translateY(-2px)}
 .btn:active{transform:translateY(5px);box-shadow:0 0 0 3px var(--ink),0 1px 0 var(--c3),0 1px 0 3px var(--ink),0 3px 6px rgba(0,0,0,.4),inset 0 2px 0 rgba(255,255,255,.5)}
 .btn:focus-visible{outline:3px solid #fff;outline-offset:6px}
+body.pad .padfocus{outline:3px solid #ffd24a;outline-offset:6px;box-shadow:0 0 22px rgba(255,210,74,.55)}
 .btn.blue{--c1:#9ad6ff;--c2:#2f86e0;--c3:#174a94;--tc:#fff;--ts:var(--ink)}
 .btn.green{--c1:#b4f08a;--c2:#46b83a;--c3:#1f6a1c;--tc:#fff;--ts:var(--ink)}
 .btn.red{--c1:#ffa08a;--c2:#e0483a;--c3:#8a1a14;--tc:#fff;--ts:var(--ink)}

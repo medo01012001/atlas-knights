@@ -58,7 +58,7 @@ function pollPads(){
     if(p){
       const ax=p.axes[0]||0,ay=p.axes[1]||0,b=n=>!!(p.buttons[n]&&p.buttons[n].pressed);
       s.left=ax<-0.4||b(14);s.right=ax>0.4||b(15);s.up=ay<-0.4||b(12);s.down=ay>0.4||b(13);
-      s.a=b(0);s.k=b(2)||b(4)||b(6);s.l=b(1)||b(5)||b(7);s.sw=b(3);s.start=b(9);s.back=b(8);
+      s.a=b(0);s.k=b(2)||b(4)||b(6);s.l=b(1)||b(5)||b(7);s.sw=b(3);s.start=b(9);s.back=b(8);s.b=b(1);
     }
     padState[i]=s;
   }
@@ -94,17 +94,17 @@ const ED={
   darcher:{hp:48,spd:1.5,dmg:10,range:360,atkCd:110,gold:6,ranged:true,look:{sc:.95,body:'#4b2a5a',dark:'#2a1833',skin:'#9a8aa8',head:'dhood',weapon:'bow'}}
 };
 const LV=[
-  {name:'المرحلة 1: غابة الأرز',bg:0,types:['goblin','goblin','goblin','skeleton'],boss:'ملك الغيلان',blook:{body:'#5a3a20',dark:'#3a2410',skin:'#6fa040',weapon:'club'}},
-  {name:'المرحلة 2: قصبة الصحراء',bg:1,types:['goblin','skeleton','darcher','skeleton'],boss:'عملاق الرمال',blook:{body:'#8a4b22',dark:'#4a2810',skin:'#c9a26a',weapon:'hammer'}},
-  {name:'المرحلة 3: جبال الأطلس',bg:2,types:['skeleton','orc','darcher','goblin'],boss:'غول الثلج',blook:{body:'#5f7f9a',dark:'#33475a',skin:'#cfe3ef',weapon:'axe'}},
-  {name:'المرحلة 4: الكهف المظلم',bg:3,types:['skeleton','orc','darcher','orc','goblin'],boss:'سيد الكهف',blook:{body:'#3a2d4a',dark:'#1f1828',skin:'#7d6a8f',weapon:'hammer'}},
-  {name:'المرحلة 5: المدينة القديمة',bg:5,types:['skeleton','darcher','orc','goblin','darcher'],boss:'حارس الأسوار',blook:{body:'#2a4a6a',dark:'#16283a',skin:'#a0b8c8',weapon:'sword',cape:'#1f6f8b'}},
-  {name:'المرحلة 6: واحة الليل',bg:6,types:['orc','darcher','skeleton','goblin','orc'],boss:'جني الواحة',blook:{body:'#1f5a5a',dark:'#0f3030',skin:'#7fd0c0',weapon:'axe'}},
-  {name:'المرحلة 7: المدينة الزرقاء',bg:7,types:['skeleton','goblin','darcher','orc','goblin'],boss:'العملاق الأزرق',blook:{body:'#2a5aa0',dark:'#163060',skin:'#9fc8f0',weapon:'hammer'}},
-  {name:'المرحلة 8: أسوار الصويرة',bg:8,types:['darcher','skeleton','orc','darcher','goblin'],boss:'قرصان البحر',blook:{body:'#203a4a',dark:'#101e28',skin:'#c9a27a',weapon:'sword',cape:'#8a1a1a'}},
-  {name:'المرحلة 9: السوق الكبير',bg:9,types:['goblin','orc','skeleton','darcher','orc'],boss:'تاجر الظلام',blook:{body:'#5a2a5a',dark:'#2e142e',skin:'#b08aa0',weapon:'axe',cape:'#3a103a'}},
-  {name:'المرحلة 10: الجبل الناري',bg:10,types:['orc','darcher','orc','skeleton','darcher'],boss:'غول النار',blook:{body:'#5a1a0a',dark:'#2a0a04',skin:'#ff7a3a',weapon:'axe'}},
-  {name:'المرحلة 11: قلعة الظلام',bg:4,types:['orc','darcher','skeleton','orc','darcher'],boss:'سيد الظلام',blook:{body:'#1a1020',dark:'#0a0610',skin:'#7a2a2a',weapon:'sword',cape:'#600'}}
+  {name:'المرحلة 1: المغرب',bg:0,types:['goblin','goblin','goblin','skeleton'],boss:'ملك الغيلان',blook:{body:'#5a3a20',dark:'#3a2410',skin:'#6fa040',weapon:'club'}},
+  {name:'المرحلة 2: الجزائر',bg:1,types:['goblin','skeleton','darcher','skeleton'],boss:'عملاق الرمال',blook:{body:'#8a4b22',dark:'#4a2810',skin:'#c9a26a',weapon:'hammer'}},
+  {name:'المرحلة 3: تونس',bg:5,types:['skeleton','orc','darcher','goblin'],boss:'حارس الأسوار',blook:{body:'#2a4a6a',dark:'#16283a',skin:'#a0b8c8',weapon:'sword',cape:'#1f6f8b'}},
+  {name:'المرحلة 4: ليبيا',bg:3,types:['skeleton','orc','darcher','orc','goblin'],boss:'سيد الكهف',blook:{body:'#3a2d4a',dark:'#1f1828',skin:'#7d6a8f',weapon:'hammer'}},
+  {name:'المرحلة 5: مصر',bg:6,types:['skeleton','darcher','orc','goblin','darcher'],boss:'جني الواحة',blook:{body:'#1f5a5a',dark:'#0f3030',skin:'#7fd0c0',weapon:'axe'}},
+  {name:'المرحلة 6: لبنان',bg:2,types:['orc','darcher','skeleton','goblin','orc'],boss:'غول الثلج',blook:{body:'#5f7f9a',dark:'#33475a',skin:'#cfe3ef',weapon:'axe'}},
+  {name:'المرحلة 7: سوريا',bg:9,types:['skeleton','goblin','darcher','orc','goblin'],boss:'تاجر الظلام',blook:{body:'#5a2a5a',dark:'#2e142e',skin:'#b08aa0',weapon:'axe',cape:'#3a103a'}},
+  {name:'المرحلة 8: العراق',bg:7,types:['darcher','skeleton','orc','darcher','goblin'],boss:'العملاق الأزرق',blook:{body:'#2a5aa0',dark:'#163060',skin:'#9fc8f0',weapon:'hammer'}},
+  {name:'المرحلة 9: عُمان',bg:8,types:['goblin','orc','skeleton','darcher','orc'],boss:'قرصان البحر',blook:{body:'#203a4a',dark:'#101e28',skin:'#c9a27a',weapon:'sword',cape:'#8a1a1a'}},
+  {name:'المرحلة 10: اليمن',bg:10,types:['orc','darcher','orc','skeleton','darcher'],boss:'غول النار',blook:{body:'#5a1a0a',dark:'#2a0a04',skin:'#ff7a3a',weapon:'axe'}},
+  {name:'المرحلة 11: الربع الخالي',bg:4,types:['orc','darcher','skeleton','orc','darcher'],boss:'سيد الظلام',blook:{body:'#1a1020',dark:'#0a0610',skin:'#7a2a2a',weapon:'sword',cape:'#600'}}
 ];
 
 /* ================= STATE ================= */
@@ -118,8 +118,7 @@ try{const v=JSON.parse(localStorage.getItem('atlasFound')||'[0]');if(Array.isArr
 if(!FOUND.includes(0))FOUND.unshift(0);FOUND.sort((a,b)=>a-b);
 function discover(i){if(FOUND.includes(i))return;FOUND.push(i);FOUND.sort((a,b)=>a-b);try{localStorage.setItem('atlasFound',JSON.stringify(FOUND));}catch(e){}}
 function nextLetter(have){for(let i=0;i<HEROES.length;i++)if(!have.includes(i))return i;return null;}
-const shop={cur:[{c:0,r:0},{c:1,r:0}]};
-function resetMenu(){menu.sel=Math.min(menu.sel,FOUND.length-1);}
+const shop={hero:0,row:1,from:'play'};
 
 function hMax(h){return Math.round(h.def.hp*(1+0.2*upg[h.idx].hp));}
 function hDmg(h){return h.def.dmg*(1+0.2*upg[h.idx].dmg)*(h.buffT>0?1.5:1);}
@@ -130,32 +129,18 @@ function makeHero(i,ctrl){
   return {kind:'hero',def:HEROES[i],idx:i,ctrl,x:0,y:0,z:0,face:1,hp:1,cdA:0,cdK:0,cdL:0,atkT:0,atkMax:1,
     walk:0,moving:false,down:false,downT:0,flash:0,inv:0,buffT:0,dashT:0,spinT:0,kx:0,dashSet:null};
 }
-function startGame(){
-  gold=0;for(const u of upg){u.dmg=0;u.hp=0;u.sk=0;}
-  shop.cur=[{c:0,r:0},{c:0,r:0}];
-  const p1=FOUND[menu.sel%FOUND.length],roster=[makeHero(p1,0)];let gift=null;
-  if(menu.mode===1){
-    let p2=FOUND.length>1?FOUND[menu.p2sel%FOUND.length]:nextLetter([p1]);
-    if(p2===p1)p2=FOUND.find(i=>i!==p1);
-    if(p2!=null){if(!FOUND.includes(p2))gift=p2;roster.push(makeHero(p2,1));discover(p2);}
-  }
-  G={level:0,roster,heroes:roster.slice(),bench:[],joins:{},p2wait:false,enemies:[],proj:[],fx:[],pick:[],zones:[],texts:[],cam:0,shake:0,met:0,gate:false};
-  // the story first, then (friend mode, first time) the friend's letter is freed, then level 1
-  let slides=storyIntro();
-  if(gift!=null){G.met=1;slides=slides.concat(storyMeet(gift,1,'غابة الأرز'));}
-  playStory(slides,()=>startLevel(0),'📖 حكاية الكتاب الكبير');
-}
+function startGame(){startStage(menu.sel);}
 function startLevel(n){
   Object.assign(G,{level:n,cam:0,enemies:[],proj:[],fx:[],pick:[],zones:[],texts:[],cps:[700,1500,2300,3100],bossX:3900,end:4400,
     cpi:0,lock:null,queue:[],spawnT:0,boss:null,bossDone:false,doneT:0,goT:0,overT:0,paused:false,banner:{t:200,s:LV[n].name}});
   let joined=null;
-  if(n>0&&n%JOIN_EVERY===0&&!G.joins[n]){ // a new letter appears every JOIN_EVERY levels
-    G.joins[n]=1;
-    const i=nextLetter(G.roster.map(h=>h.idx));
+  if(n>0&&n%JOIN_EVERY===0&&!PROG.joins[n]){ // a new letter appears every JOIN_EVERY levels
+    PROG.joins[n]=1;
+    const i=nextLetter(FOUND);
     if(i!=null){
       const p2=G.p2wait&&!G.roster.some(o=>o.ctrl===1),h=makeHero(i,p2?1:'bot');if(p2)G.p2wait=false;
       G.roster.push(h);discover(i);joined=h;
-      if(G.heroes.length<MAX_FIELD)G.heroes.push(h);
+      if(G.heroes.length<MAX_FIELD){G.heroes.push(h);PROG.team=G.heroes.map(o=>o.idx);}
       else{const b=G.heroes.findIndex(o=>o.ctrl==='bot');if(b>=0){G.bench.push(G.heroes[b]);G.heroes[b]=h;}else G.bench.push(h);}
     }
   }
@@ -168,8 +153,8 @@ function startLevel(n){
   }
   // story: a chapter when a letter is freed, and the gate before the last level
   let slides=[],title='';
-  if(joined){G.met=(G.met||0)+1;slides=storyMeet(joined.idx,G.met,LV[n].name.split(': ')[1]||LV[n].name);title='✨ لقيتي حرف: '+joined.def.name;}
-  if(n===LV.length-1&&!G.gate){G.gate=true;slides=slides.concat(storyGate());if(!title)title='🏰 قلعة الظلام';}
+  if(joined){G.met=(G.met||0)+1;slides=storyMeet(joined.idx,G.met,COUNTRY[n].c);saveProg();title='✨ لقيتي حرف: '+joined.def.name;}
+  if(n===LV.length-1&&!PROG.gate){PROG.gate=1;G.gate=true;saveProg();slides=slides.concat(storyGate());if(!title)title='🏰 قلعة الظلام';}
   state='play';
   if(slides.length)playStory(slides,()=>{state='play';},title);
 }
@@ -561,7 +546,7 @@ function updBoss(b){
 function humans(){return G.heroes.filter(h=>h.ctrl!=='bot'&&!h.down);}
 function updPlay(){
   if(pressed.Escape||pressed.KeyP)G.paused=!G.paused;
-  if(G.paused){if(pressed.Backspace){state='menu';resetMenu();}return;}
+  if(G.paused){if(pressed.Backspace)resetMenu();return;}
   if(G.banner.t>0)G.banner.t--;
   if(G.goT>0)G.goT--;
   if(G.flashT>0)G.flashT--;
@@ -654,6 +639,12 @@ function updPlay(){
     else{
       G.lock=null;G.goT=150;
       for(const h of G.heroes)if(h.down){h.down=false;h.hp=Math.round(hMax(h)*0.5);h.inv=90;addText(h.x,h.y,100,'رجع!','#7f7');}
+        else{ // every step forward in the stage gives back a little health
+          const m=hMax(h),add=Math.min(m-h.hp,Math.max(5,Math.round(m*0.08)));
+          if(add>0){h.hp+=add;addText(h.x,h.y,110,'+'+add+' ❤','#7dff8a');part(h.x,h.y,50,'#9dffb0',8,2,4,28);}
+        }
+      for(const b of G.bench)if(!b.down)b.hp=Math.min(hMax(b),b.hp+Math.round(hMax(b)*0.08));
+      if(G.heroes.some(h=>!h.down))SFX.coin();
     }
   }
   if(G.doneT>0){
@@ -662,7 +653,7 @@ function updPlay(){
     if(G.doneT>230){
       for(const c of G.pick)if(c.type==='coin')gold+=c.val;
       G.pick=[];
-      if(G.level>=LV.length-1){playStory(storyEnding(),()=>{state='win';},'📖 النهاية');}else{state='shop';}
+      stageCleared();
       return;
     }
   }
@@ -679,44 +670,31 @@ function updPlay(){
 }
 
 /* ================= MENU / SHOP / END ================= */
-function updMenu(){
-  const n=FOUND.length;menu.sel%=n;
-  if(tap(0,'up')||tap(0,'down')){menu.mode^=1;SFX.coin();}
-  if(tap(1,'a')&&menu.mode===0){menu.mode=1;SFX.coin();}
-  if(tap(1,'k')&&menu.mode===1){menu.mode=0;SFX.no();}
-  if(tap(0,'left'))menu.sel=(menu.sel+1)%n;if(tap(0,'right'))menu.sel=(menu.sel+n-1)%n; // cards run right-to-left
-  if(menu.mode===1&&n>1){
-    if(tap(1,'left'))menu.p2sel=(menu.p2sel+1)%n;if(tap(1,'right'))menu.p2sel=(menu.p2sel+n-1)%n;
-    if(menu.p2sel%n===menu.sel)menu.p2sel=(menu.sel+1)%n;
-  }
-  if(pressed.Enter||pressed.NumpadEnter||pressed.Space||tap(0,'a')){SFX.buy();startGame();}
-  else if(pressed.Escape)goHome();
-}
 function goHome(){location.href='index.html';}
 function upCost(lv){return 30+lv*30;}
 function shopBuy(c,r){
   const key=['dmg','hp','sk'][r],u=upg[G.roster[c].idx],lv=u[key];
-  if(lv>=5||gold<upCost(lv)){SFX.no();}else{gold-=upCost(lv);u[key]++;SFX.buy();}
+  if(lv>=5||gold<upCost(lv)){SFX.no();}else{gold-=upCost(lv);u[key]++;SFX.buy();saveProg();}
 }
 function updShop(){
-  const ps=[0];if(G.roster.some(h=>h.ctrl===1))ps.push(1);
-  const N=G.roster.length;
-  for(const p of ps){
-    const c=shop.cur[p];c.c=Math.min(c.c,N-1);
-    if(tap(p,'right'))c.c=(c.c+N-1)%N;if(tap(p,'left'))c.c=(c.c+1)%N; // cards run right-to-left
-    if(tap(p,'up'))c.r=(c.r+3)%4;if(tap(p,'down'))c.r=(c.r+1)%4;
-    if(tap(p,'a')){
-      if(c.r===3){startLevel(G.level+1);return;}
-      shopBuy(c.c,c.r);
-    }
+  const N=G.roster.length;shop.hero=clamp(shop.hero|0,0,N-1);
+  for(const p of [0,1]){
+    if(tap(p,'left')){shop.hero=(shop.hero+1)%N;SFX.coin();} // letters run right-to-left
+    if(tap(p,'right')){shop.hero=(shop.hero+N-1)%N;SFX.coin();}
+    const ui=[1,0,2,3],k=Math.max(0,ui.indexOf(shop.row|0)); // screen order: health, power, skills, then the next button
+    if(tap(p,'up')){shop.row=ui[(k+3)%4];SFX.coin();}
+    if(tap(p,'down')){shop.row=ui[(k+1)%4];SFX.coin();}
+    if(tap(p,'a')){if(shop.row===3){shopNext();return;}shopBuy(shop.hero,shop.row);}
   }
-  if(pressed.Enter||pressed.NumpadEnter){startLevel(G.level+1);}
+  if(pressed.Enter||pressed.NumpadEnter)shopNext();
+  else if(pressed.Escape)resetMenu();
 }
+function shopNext(){if(shop.from==='map')startStage(menu.sel);else{menu.sel=Math.min(G.level+1,LV.length-1);startStage(menu.sel);}}
 function updEnd(){
   if(state==='over'){
     if(pressed.Enter||pressed.NumpadEnter){startLevel(G.level);}
-    else if(pressed.Escape){state='menu';resetMenu();}
-  }else if(pressed.Enter||pressed.NumpadEnter||pressed.Escape){state='menu';resetMenu();}
+    else if(pressed.Escape)resetMenu();
+  }else if(pressed.Enter||pressed.NumpadEnter||pressed.Escape)resetMenu();
 }
 
 /* ================= DRAW: CHARACTERS ================= */
@@ -1003,6 +981,8 @@ function update(){
   for(let p=0;p<2;p++){
     if(padTap(p,'start')){if(state==='play')pressed.Escape=true;else pressed.Enter=true;}
     if(padTap(p,'back')){if(state==='play'&&G.paused)pressed.Backspace=true;else pressed.Escape=true;}
+    if(padTap(p,'b')){if(state==='play'){if(G.paused)G.paused=false;}else if(state!=='story')pressed.Escape=true;} // B = back in every menu
+    if(padTap(p,'a')&&(state==='over'||state==='win'))pressed.Enter=true;
   }
   if(state==='menu')updMenu();
   else if(state==='play')updPlay();
@@ -1030,4 +1010,4 @@ function loop(now){
   while(acc>=1000/60){update();acc-=1000/60;}
   draw();requestAnimationFrame(loop);
 }
-requestAnimationFrame(loop);
+// the loop starts at the end of map.js, once every script is loaded

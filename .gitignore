@@ -5,3 +5,6 @@ assets/start_frames/
 assets/videos/
 tools/
 __pycache__/
+
+# original downloads of the home art (resized copies live in assets/home/)
+Cartoon_*.jpg

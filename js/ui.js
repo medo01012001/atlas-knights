@@ -210,86 +210,91 @@ function drawHUD(){
     panel(px,py,pw,ph);ribbonFit(W/2,py+4,'⏸ واقف',26,'#2f6fd0',220);
     txt(LV[G.level].name,W/2,py+62,16,'#e6e2f4','center',false);
     btn(W/2+10,py+92,200,48,'▶ كمل',()=>{G.paused=false;},'gold');
-    btn(W/2-210,py+92,200,48,'☰ القائمة',()=>{state='menu';resetMenu();},'dark');
-    txt('Esc باش تكمل  —  Backspace للقائمة',W/2,py+180,13,'#bdb8d6','center',false);
+    btn(W/2-210,py+92,200,48,'🗺 الخريطة',resetMenu,'dark');
+    txt(padCount?'🎮 Start ولا B باش تكمل  —  Select للخريطة':'Esc باش تكمل  —  Backspace للخريطة',W/2,py+180,13,'#bdb8d6','center',false);
   }
-}
-function drawMenu(){
-  drawBG(0,frame*0.6);
-  ctx.fillStyle=vgrad(0,H,['rgba(10,6,24,.6)','rgba(10,6,24,.2)','rgba(10,6,24,.75)']);ctx.fillRect(0,0,W,H);
-  vignette(0.55);
-  btn(14,12,46,40,'🏠',goHome,'dark',{size:19});
-  btn(W-60,12,46,40,'⛶',toggleFS,'dark',{size:19});
-  logo(W/2,42,40);
-  const F=FOUND,NH=F.length;
-  ribbonFit(W/2,92,NH===1?'ابدا المغامرة بالألف... وشوف شنو كيتسناك فالطريق':'ختار الحرف لي غادي تبدا بيه',15,'#b8322a',340);
-  const step=Math.min(215,(W-20)/NH),cw=Math.min(200,step-14),y=118,hh=244;
-  for(let k=0;k<NH;k++){
-    const i=F[k],L=LET[i],H_=HEROES[i],cx=W/2+((NH-1)/2-k)*step,x=cx-cw/2;
-    const s1=menu.sel===k,s2=menu.mode===1&&NH>1&&menu.p2sel%NH===k,hv=overBox(x,y,cw,hh),yy=y-((s1||s2)?4:(hv?2:0));
-    if(s1||s2){ctx.save();ctx.shadowColor=s1?'#4da3ff':'#ff5b5b';ctx.shadowBlur=26;ctx.fillStyle=INK;rp(x,yy,cw,hh,16);ctx.fill();ctx.restore();}
-    panel(x,yy,cw,hh,{frame:s1&&s2?FRAMES.gold:s1?FRAMES.blue:s2?FRAMES.red:(hv?FRAMES.gold:FRAMES.steel),r:16});
-    hit(x,y,cw,hh,()=>{menu.sel=k;if(menu.mode===1&&menu.p2sel%NH===k)menu.p2sel=(k+1)%NH;SFX.coin();},()=>{if(menu.mode===1&&NH>1&&k!==menu.sel){menu.p2sel=k;SFX.coin();}});
-    const wx=x+10,wy=yy+10,ww=cw-20,wh=120,gy=wy+wh*0.62;
-    ctx.save();rp(wx,wy,ww,wh,10);ctx.clip();
-    const g=ctx.createRadialGradient(cx,gy,4,cx,gy,ww*0.8);g.addColorStop(0,shade(L.col,.3));g.addColorStop(0.55,L.dark);g.addColorStop(1,'#0c0a18');ctx.fillStyle=g;ctx.fillRect(wx,wy,ww,wh);
-    ctx.globalAlpha=0.1;ctx.fillStyle='#fff';for(let r=0;r<8;r++){const a=r*Math.PI/4+frame*0.004;ctx.beginPath();ctx.moveTo(cx,gy);ctx.arc(cx,gy,ww,a,a+0.2);ctx.closePath();ctx.fill();}ctx.globalAlpha=1;
-    ctx.fillStyle=INK;ell(cx,wy+wh-11,ww*0.36,10);ctx.fill();ctx.fillStyle=vgrad(wy+wh-20,wy+wh-2,['#6a6490','#2a2440']);ell(cx,wy+wh-12,ww*0.34,8);ctx.fill();
-    const atk=s1&&(frame%120)<16?(frame%120)/16:-1;
-    drawHeroLook(i,cx,wy+wh-13,1,Math.min(0.95,ww/150*0.95),{atk});
-    ctx.restore();
-    ctx.strokeStyle=INK;ctx.lineWidth=2.5;rp(wx,wy,ww,wh,10);ctx.stroke();
-    ribbon(cx,yy+144,cw-8,H_.name,16,L.col);
-    txt(H_.desc,cx,yy+172,12,'#e6e2f4','center',false);
-    ctx.fillStyle='rgba(255,210,74,.13)';rp(x+10,yy+183,cw-20,20,6);ctx.fill();
-    txt('✦ '+H_.pas,cx,yy+193,11,'#ffd24a','center',false);
-    keyRow(cx,yy+214,[[KL.KeyK],H_.k.name],10,'#bfe0ff');
-    keyRow(cx,yy+232,[[KL.KeyL],H_.l.name],10,'#bfe0ff');
-    if(s1)pill(x+24,yy+14,'P1',TAGC[0],11);
-    if(s2)pill(x+cw-24,yy+14,'P2',TAGC[1],11);
-  }
-  const bw=180,by=374;
-  [['👤 بوحدي',0],['👥 مع صاحبي',1]].forEach(([t,m],k)=>{const bx=W/2+(k?-bw-6:6),on=menu.mode===m;
-    btn(bx,by,bw,34,t,()=>{if(menu.mode!==m){menu.mode=m;SFX.coin();}},on?'blue':'dark',{size:16});});
-  btn(W/2-150,422,300,46,'▶ ابدا اللعب',()=>{SFX.buy();startGame();},'gold',{size:24,glow:true});
-  panel(30,482,W-60,52,{frame:FRAMES.steel,noCorners:true,r:12,b:3,top:'#1e2246',bot:'#121330'});
-  const k=KL,row=['🔵 اللاعب 1:',[k.KeyW,k.KeyA,k.KeyS,k.KeyD],'حركة','•',[k.KeyJ],'ضربة','•',[k.KeyK,k.KeyL],'مهارات'];
-  if(NH>1)row.push('•',[k.KeyQ],'بدل');
-  row.push('•',['Esc'],'رجوع');
-  keyRow(W/2,497,row,11);
-  const p2t=menu.mode===0?'🔴 '+k.KeyW+'/'+k.KeyS+' ولا ضربة اللاعب 2 باش تلعب مع صاحبك':
-    (NH>1?'🔴 اللاعب 2: الأسهم و ⁦'+k.Comma+' '+k.Period+' '+k.Slash+'⁩ — كيختار بالأسهم ولا بالكليك اليمين':'🎁 صاحبك غادي يبدا بحرف جديد — كيلعب بالأسهم و ⁦'+k.Comma+' '+k.Period+' '+k.Slash+'⁩');
-  txt(p2t+'     🎮 '+(padCount?padCount+' مانيطة متصلة':'المانيطة خدامة حتى هي'),W/2,520,12,'#cfd0e8','center',false);
 }
 function drawShop(){
   drawBG(LV[G.level].bg,0);
-  ctx.fillStyle='rgba(8,6,20,.62)';ctx.fillRect(0,0,W,H);vignette(0.5);
-  ribbonFit(W/2,34,'🛒 الحانوت',26,'#b8322a',260);
-  coinPill(W/2,76,gold,'center');
-  const rows=['⚔ القوة','❤ الصحة','✨ المهارات'];
-  const ps=[0];if(G.heroes.some(h=>h.ctrl===1))ps.push(1);
-  const cards=G.roster.length,step=Math.min(225,(W-30)/Math.max(cards,2)),w=step-14;
-  for(let c=0;c<cards;c++){
-    const x=W/2+(cards/2-c-1)*step+7,hr=G.roster[c],li=hr.idx,bench=G.bench.includes(hr);
-    panel(x,96,w,346,{frame:bench?FRAMES.steel:(hr.ctrl===0||hr.ctrl===1?heroFrame(hr):FRAMES.gold),r:14});
-    medallion(x+w/2,136,30,li,{dim:bench,ring:FRAMES.gold});
-    txt(HEROES[li].name,x+w/2,182,18,'#fff');
-    if(bench)pill(x+w/2,204,'احتياط','#6a6f90',10);else pill(x+w/2,204,tagTxt(hr),heroTagCol(hr),10);
-    for(let r=0;r<3;r++){
-      const key=['dmg','hp','sk'][r],lv=upg[li][key],by=224+r*70,bx=x+10,bww=w-20,hv=overBox(bx,by,bww,60),cost=upCost(lv);
-      ctx.fillStyle=hv?'rgba(255,255,255,.16)':'rgba(0,0,0,.3)';rp(bx,by,bww,60,10);ctx.fill();
-      ctx.strokeStyle='rgba(255,255,255,.12)';ctx.lineWidth=1.5;ctx.stroke();
-      hit(bx,by,bww,60,()=>{shop.cur[0].c=c;shop.cur[0].r=r;shopBuy(c,r);});
-      txt(rows[r],x+w/2,by+13,13,'#fff','center',false);
-      for(let s=0;s<5;s++)diamond(x+w/2+32-s*16,by+31,5.5,s<lv?'#ffd24a':'#3a3450');
-      if(lv>=5)pill(x+w/2,by+48,'MAX','#3aa04a',10);
-      else{const ok=gold>=cost,cw2=tw(''+cost,13);coin(x+w/2+cw2/2+4,by+48,6);txt(''+cost,x+w/2-6,by+48,13,ok?'#ffd24a':'#8a86a0','center',false);}
-      ps.forEach(p=>{const cu=shop.cur[p];if(cu.c===c&&cu.r===r){ctx.strokeStyle=p===0?'#6ab4ff':'#ff6b5b';ctx.lineWidth=3;rp(bx-p*4,by-p*4,bww+p*8,60+p*8,10);ctx.stroke();}});
-    }
+  ctx.fillStyle='rgba(8,6,20,.7)';ctx.fillRect(0,0,W,H);vignette(0.5);
+  const N=G.roster.length;shop.hero=clamp(shop.hero|0,0,N-1);
+  const hr=G.roster[shop.hero],li=hr.idx,D=HEROES[li],L=LET[li],u=upg[li],bench=G.bench.includes(hr),row=shop.row|0;
+  // header
+  ribbonFit(W/2,30,'⚒ تطوير الحروف',22,'#b8322a',280);
+  coinPill(14,30,gold);
+  const fromMap=shop.from==='map';
+  if(!fromMap&&G.fact){pill(W-110,22,'✅ ربحتي '+G.fact.c,'#2f8a2a',12);if(G.bonus)pill(W-110,48,'🎁 مكافأة: +'+G.bonus,'#c8800e',11);}
+  const top=66,ch=392;
+  // ---- hero card (right) ----
+  const pw=Math.min(340,Math.round(W*0.36)),px=W-14-pw;
+  panel(px,top,pw,ch,{frame:FRAMES.gold,r:14});
+  const wx=px+16,wy=top+16,ww=pw-32,wh=178;
+  ctx.save();rp(wx,wy,ww,wh,10);ctx.clip();ctx.translate(wx,wy);ctx.scale(ww/W*1.6,wh/H*1.6);ctx.translate(-W*0.1,-H*0.32);drawBG(LV[G.level].bg,frame*0.3);ctx.restore();
+  ctx.save();rp(wx,wy,ww,wh,10);ctx.clip();
+  ctx.fillStyle='rgba(0,0,0,.35)';ell(wx+ww/2,wy+wh-20,48,11);ctx.fill();
+  const t=frame%140,atk=t<16?t/16:-1;
+  drawHeroLook(li,wx+ww/2,wy+wh-22,1,1.05,{atk});
+  ctx.restore();
+  ctx.strokeStyle=INK;ctx.lineWidth=3;rp(wx,wy,ww,wh,10);ctx.stroke();
+  // banner in the letter's colour + who controls it
+  ctx.fillStyle=INK;ctx.fillRect(wx+ww-38,wy-3,28,44);ctx.fillStyle=L.col;ctx.beginPath();ctx.moveTo(wx+ww-36,wy);ctx.lineTo(wx+ww-12,wy);ctx.lineTo(wx+ww-12,wy+38);ctx.lineTo(wx+ww-24,wy+30);ctx.lineTo(wx+ww-36,wy+38);ctx.closePath();ctx.fill();
+  pill(wx+34,wy+16,bench?'احتياط':tagTxt(hr),bench?'#6a6f90':heroTagCol(hr),10);
+  // arrows to the other letters
+  if(N>1){
+    const ay=wy+wh/2,arrow=(ax,lab,d)=>{const hv=overBox(ax-20,ay-20,40,40);ctx.fillStyle=INK;circ(ax,ay,20);ctx.fillStyle=vgrad(ay-18,ay+18,hv?['#fff8c0','#ffd84a']:GOLDB);circ(ax,ay,17.5);
+      txt(lab,ax,ay+1,18,'#fff','#6a3000');hit(ax-20,ay-20,40,40,()=>{shop.hero=(shop.hero+d+N)%N;SFX.coin();});};
+    arrow(wx-4,'◀',1);arrow(wx+ww+4,'▶',-1);
+    for(let k=0;k<N;k++){const dx=wx+ww/2+((N-1)/2-k)*16;ctx.fillStyle=INK;circ(dx,wy+wh+12,5.5);ctx.fillStyle=k===shop.hero?'#ffd24a':'#4a4e70';circ(dx,wy+wh+12,4);}
   }
-  const sel=ps.some(p=>shop.cur[p].r===3);
-  btn(W/2-150,454,300,46,'➜ المرحلة الجاية',()=>startLevel(G.level+1),sel?'green':'gold',{size:22,glow:sel});
-  txt('تحرك بالأسهم/'+KL.KeyW+KL.KeyA+KL.KeyS+KL.KeyD+' ولا المانيطة — الضربة (A) ولا الكليك باش تشري — Enter ولا Start باش تكمل',W/2,524,13,'#c8c4dc','center',false);
+  // name, level, numbers
+  const iy=wy+wh+26,lvl=1+u.dmg+u.hp+u.sk;
+  ctx.fillStyle='rgba(0,0,0,.28)';rp(wx,iy,ww,ch-(iy-top)-16,10);ctx.fill();
+  txt(D.name,wx+ww-12,iy+22,22,'#fff','right');
+  txt((D.type==='melee'?'⚔ من قريب':'🏹 من بعيد'),wx+ww-12,iy+48,12,'#c8c4dc','right',false);
+  txt('مستوى '+lvl,wx+56,iy+22,18,'#ffd24a');
+  const hpN=Math.round(D.hp*(1+0.2*u.hp)),dmN=Math.round(D.dmg*(1+0.2*u.dmg)),skN=Math.round(15*u.sk);
+  const lines=[['❤',hpN,'+'+Math.round(D.hp*0.2),1,u.hp],['⚔',dmN,'+'+(Math.round(D.dmg*2)/10),0,u.dmg],['✨','+'+skN+'%','+15%',2,u.sk]];
+  lines.forEach(([ic,v,plus,r,lv],k)=>{const ly=iy+76+k*26;
+    txt(ic,wx+ww-22,ly,15,'#fff','center',false);txt(''+v,wx+ww-42,ly,16,'#fff','right');
+    if(row===r&&lv<5)txt(plus,wx+ww-118,ly,15,'#7dff6a','right');});
+  // ---- upgrades (left) ----
+  const lx=14,lw=px-lx-14;
+  panel(lx,top,lw,ch,{frame:FRAMES.gold,r:14});
+  const sec=(y,label)=>{txt(label,lx+lw-20,y,16,'#ffd24a','right');setFont(16);const w=ctx.measureText(label).width;ctx.strokeStyle='rgba(255,210,74,.35)';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(lx+20,y);ctx.lineTo(lx+lw-30-w,y);ctx.stroke();};
+  sec(top+22,'القدرات');
+  const rowsD=[['❤','الصحة','hp','#e8404a',1],['⚔','القوة','dmg','#c86a10',0],['✨','المهارات','sk','#2a8ad0',2]]; // last = shopBuy row
+  const bW=Math.min(120,lw*0.24),rh=54;
+  rowsD.forEach(([ic,nm,key,col,r],k)=>{
+    const y=top+40+k*(rh+8),lv=u[key],cost=upCost(lv),sel=row===r,max=lv>=5,ok=gold>=cost;
+    ctx.fillStyle=sel?'rgba(255,210,74,.16)':'rgba(0,0,0,.25)';rp(lx+14,y,lw-28,rh,10);ctx.fill();
+    if(sel){ctx.strokeStyle='#ffd24a';ctx.lineWidth=2.5;ctx.stroke();}
+    hit(lx+14,y,lw-28-bW-10,rh,()=>{shop.row=r;});
+    const ix=lx+lw-14-50;ctx.fillStyle=INK;rp(ix,y+5,44,44,9);ctx.fill();ctx.fillStyle=vgrad(y+7,y+47,['#fff0c8','#d8b070']);rp(ix+2,y+7,40,40,8);ctx.fill();
+    txt(ic,ix+22,y+28,22,col,false);
+    txt(nm,ix-10,y+15,13,'#fff','right',false);
+    const bx=lx+14+bW+20,bw=ix-14-bx,segW=bw/5;
+    ctx.fillStyle=INK;rp(bx-3,y+26,bw+6,20,6);ctx.fill();
+    for(let s=0;s<5;s++){const sx=bx+bw-(s+1)*segW;ctx.fillStyle=s<lv?vgrad(y+28,y+44,GOLDB):'#3a3450';rp(sx+2,y+28,segW-4,16,3);ctx.fill();}
+    const btx=lx+22,bty=y+9;
+    if(max)btn(btx,bty,bW,32,'MAX ✔',null,'green',{size:15});
+    else{btn(btx,bty,bW,32,'',()=>{shop.row=r;shopBuy(shop.hero,r);},ok?'gold':'dark');
+      coin(btx+bW/2+tw(''+cost,16)/2+4,bty+16,8);txt(''+cost,btx+bW/2-8,bty+17,16,ok?'#fff':'#9a96b0',ok?'#6a3000':INK);}
+  });
+  const sy=top+40+3*(rh+8)+18;
+  sec(sy,'المهارات');
+  [[KL.KeyK,D.k.name,D.kd],[KL.KeyL,D.l.name,D.ld]].forEach(([key,nm,ds],k)=>{
+    const y=sy+16+k*(rh+6);
+    ctx.fillStyle='rgba(0,0,0,.25)';rp(lx+14,y,lw-28,rh,10);ctx.fill();
+    keycap(lx+lw-14-26,y+rh/2,key,16);
+    txt(nm,lx+lw-64,y+16,14,'#bfe0ff','right',false);
+    wrapLines(ds,lw-190,11).slice(0,2).forEach((s,j)=>txt(s,lx+lw-64,y+33+j*14,11,'#c8c4dc','right',false));
+    for(let s=0;s<5;s++)diamond(lx+34+s*15,y+rh/2,5,s<u.sk?'#7fd6ff':'#3a3450');
+  });
+  // ---- bottom ----
+  const sel3=row===3;
+  btn(W/2-10-210,466,210,44,'🗺 الخريطة',resetMenu,'dark',{size:19});
+  btn(W/2+10,466,240,44,fromMap?'⚔ ابدا المرحلة '+(menu.sel+1):'➜ المرحلة الجاية',shopNext,sel3?'green':'gold',{size:20,glow:sel3});
+  txt(padCount?'🎮 ◀▶ بدل الحرف  •  ▲▼ ختار  •  A شري  •  B الخريطة':'⌨ '+KL.KeyA+'/'+KL.KeyD+' بدل الحرف  •  '+KL.KeyW+'/'+KL.KeyS+' ختار  •  '+KL.KeyJ+' شري  •  Enter كمل  •  Esc الخريطة',W/2,528,12,'#c8c4dc','center',false);
 }
 function drawOver(){
   drawPlay();
@@ -299,8 +304,8 @@ function drawOver(){
   ribbonFit(W/2,py+4,'💀 خسرتو!',30,'#b8322a',240);
   txt('الحروف طاحو كاملين... ولكن المغامرة باقا',W/2,py+66,16,'#f0dce4','center',false);
   btn(W/2+10,py+100,210,50,'↻ عاود المرحلة',()=>startLevel(G.level),'gold');
-  btn(W/2-220,py+100,210,50,'☰ القائمة',()=>{state='menu';resetMenu();},'dark');
-  txt('Enter = عاود     Esc = القائمة',W/2,py+188,13,'#c8b0bc','center',false);
+  btn(W/2-220,py+100,210,50,'🗺 الخريطة',resetMenu,'dark');
+  txt('Enter = عاود     Esc = الخريطة',W/2,py+188,13,'#c8b0bc','center',false);
 }
 function drawWin(){
   drawBG(4,frame*0.5);
@@ -319,5 +324,5 @@ function drawWin(){
     drawHeroLook(i,x,py-jump,1,Math.min(1.25,st/115),{atk:(frame+i*20)%60<16?((frame+i*20)%60)/16:-1});
   }
   coinPill(W/2,446,gold,'center');
-  btn(W/2-120,472,240,46,'☰ رجوع للقائمة',()=>{state='menu';resetMenu();},'gold',{glow:true});
+  btn(W/2-120,472,240,46,'🗺 رجوع للخريطة',resetMenu,'gold',{glow:true});
 }

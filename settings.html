@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/ui.css?v=3">
+<link rel="stylesheet" href="css/ui.css?v=9">
 <style>
 .wrap{max-width:720px;margin:28px auto 0}
 .val{min-width:54px;text-align:center}
@@ -50,7 +50,7 @@
 <div class="modal hide" id="modal" role="dialog" aria-modal="true">
   <div class="panel red"><div class="in">
     <p style="margin:6px 0 4px"><span class="ribbon">⚠ متأكد؟</span></p>
-    <p style="font-size:18px;margin:18px 0 22px">غادي تمسح الحروف اللي لقيتي. هادشي ما كيرجعش.</p>
+    <p style="font-size:18px;margin:18px 0 22px">غادي تمسح الحروف، المراحل، الفلوس والقوة. هادشي ما كيرجعش.</p>
     <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
       <button class="btn red" id="yes">إيه، مسح</button>
       <button class="btn dark" id="no">لا، رجع</button>
@@ -58,10 +58,10 @@
   </div></div>
 </div>
 <span class="pill green saved" id="saved">✔ تسجل</span>
-<script src="js/core.js?v=3"></script>
-<script src="js/data.js?v=3"></script>
-<script src="js/letters.js?v=3"></script>
-<script src="js/site.js?v=3"></script>
+<script src="js/core.js?v=9"></script>
+<script src="js/data.js?v=9"></script>
+<script src="js/letters.js?v=9"></script>
+<script src="js/site.js?v=9"></script>
 <script>
 'use strict';
 const $=id=>document.getElementById(id);
@@ -87,7 +87,7 @@ document.addEventListener('fullscreenchange',()=>{$('fs').textContent=document.f
 // reset progress
 $('reset').onclick=()=>{$('modal').classList.remove('hide');$('no').focus();};
 $('no').onclick=()=>$('modal').classList.add('hide');
-$('yes').onclick=()=>{try{localStorage.removeItem('atlasFound');}catch(e){}$('modal').classList.add('hide');$('saved').textContent='✔ تمسح';saved();setTimeout(()=>{$('saved').textContent='✔ تسجل';},1300);};
+$('yes').onclick=()=>{try{localStorage.removeItem('atlasFound');localStorage.removeItem('atlasProg');}catch(e){}$('modal').classList.add('hide');$('saved').textContent='✔ تمسح';saved();setTimeout(()=>{$('saved').textContent='✔ تسجل';},1300);};
 </script>
 </body>
 </html>

@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/game.css?v=13">
+<link rel="stylesheet" href="css/game.css?v=14">
 <style>
 /* ---------- loading screen (inline so it shows before anything else loads) ---------- */
 #loader{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;overflow:hidden;
@@ -53,7 +53,7 @@
 @keyframes stripes{to{background-position:28px 0,0 0}}
 .bar em{position:absolute;inset:0;display:grid;place-items:center;font-style:normal;font-weight:800;font-size:15px;direction:ltr;
   text-shadow:1.5px 0 #120c1c,-1.5px 0 #120c1c,0 1.5px #120c1c,0 -1.5px #120c1c}
-.tip{position:relative;min-height:30px;font-size:17px;font-weight:700;color:#e6e2f4;text-align:center;padding:0 16px;transition:opacity .35s}
+.tip{position:relative;min-height:30px;max-width:min(640px,92vw);line-height:1.5;font-size:17px;font-weight:700;color:#e6e2f4;text-align:center;padding:0 16px;transition:opacity .35s}
 .tip.hide{opacity:0}
 @media (max-height:520px){#loader{gap:12px}.seal{transform:scale(.75);margin:-16px}.march{height:54px}.march span{font-size:36px}}
 </style>
@@ -68,16 +68,22 @@
     <span style="--c:#ffb070;--k:3">ص</span><span style="--c:#ff8aa4;--k:4">ب</span><span style="--c:#ff8ae0;--k:5">ع</span>
   </div>
   <div class="bar"><i id="ldBar"></i><em id="ldPct">0%</em></div>
-  <div class="tip" id="ldTip">💡 الحروف كيتجمعو... صبر شوية</div>
+  <div class="tip" id="ldTip"></div>
 </div>
 <script>
 /* The loader: shows real progress (scripts, font, story pictures), never stays more than a few seconds */
 window.LOADER=(function(){
   const t0=performance.now(),bar=document.getElementById('ldBar'),pct=document.getElementById('ldPct'),tip=document.getElementById('ldTip');
-  const tips=['💡 كل حرف عندو مهارتين: K و L','💡 جمع الفلوس وطور الحروف ديالك فالحانوت','💡 كل بلاد فالخريطة فيها معلومة جديدة كتعلمها',
-    '💡 بدل الحرف بـ Q وسط المعركة','💡 المانيطة خدامة فكلشي: A ختار و B رجع','💡 القلوب اللي كيطيحو من الأعداء كيرجعو الصحة','💡 كل ما دوزتي جزء من المرحلة كتزاد ليك شوية ديال الصحة'];
-  let p=0,k=0,on=true;
-  const tipT=setInterval(()=>{tip.classList.add('hide');setTimeout(()=>{tip.textContent=tips[k++%tips.length];tip.classList.remove('hide');},350);},2600);
+  const tips=['💡 كل حرف عندو مهارتين: K و L','🌍 جامعة القرويين ففاس، بناتها فاطمة الفهرية عام 859، أقدم جامعة باقا خدامة فالعالم',
+    '📖 فبلاد الأطلس، كانو الحروف عايشين فـ«الكتاب الكبير»...','💡 جمع الفلوس وطور الحروف ديالك فالحانوت',
+    '🌍 الجزائر هي أكبر بلد فإفريقيا بالمساحة، والصحرا كتغطي تقريبا 80% منها','📖 خيال كحل سرق «الدواية الذهبية»، المداد اللي كيعطي الحياة للحروف',
+    '💡 بدل الحرف بـ Q وسط المعركة','🌍 الهرم الأكبر فمصر بقا أعلى بناء فالعالم أكثر من 3800 عام',
+    '💡 المانيطة خدامة فكلشي: A ختار و B رجع','🌍 فبلاد الرافدين (العراق) تخترعات الكتابة المسمارية، من أقدم الكتابات فالتاريخ',
+    '📖 الحروف تفرقو فالبلدان العربية... وخاصك تقلب عليهم واحد بواحد','💡 القلوب اللي كيطيحو من الأعداء كيرجعو الصحة',
+    '🌍 مدينة جبيل فلبنان من أقدم المدن فالعالم، ومنها انتاشرات الأبجدية الفينيقية','💡 كل ما دوزتي جزء من المرحلة كتزاد ليك شوية ديال الصحة',
+    '🌍 شبام فاليمن فيها عمارات طوال بالطين، كيسميوها «منهاتن الصحرا»'];
+  let p=0,k=Math.floor(Math.random()*tips.length),on=true;tip.textContent=tips[k++%tips.length];
+  const tipT=setInterval(()=>{tip.classList.add('hide');setTimeout(()=>{tip.textContent=tips[k++%tips.length];tip.classList.remove('hide');},350);},3400);
   function set(v){p=Math.max(p,Math.min(1,v));bar.style.width=(p*100)+'%';pct.textContent=Math.round(p*100)+'%';}
   function done(){if(!on)return;set(1);const wait=Math.max(0,1500-(performance.now()-t0));
     setTimeout(()=>{on=false;LOADER.on=false;clearInterval(tipT);const el=document.getElementById('loader');el.classList.add('out');setTimeout(()=>el.remove(),550);},wait+250);}
@@ -87,16 +93,17 @@ window.LOADER=(function(){
 })();
 </script>
 <canvas id="c"></canvas>
-<script src="js/core.js?v=13"></script>
+<script src="js/core.js?v=14"></script>
 <script>LOADER.set(0.2)</script>
-<script src="js/data.js?v=13"></script>
-<script src="js/letters.js?v=13"></script>
+<script src="js/data.js?v=14"></script>
+<script src="js/letters.js?v=14"></script>
 <script>LOADER.set(0.32)</script>
-<script src="js/ui.js?v=13"></script>
-<script src="js/voice.js?v=13"></script>
-<script src="js/story.js?v=13"></script>
+<script src="js/ui.js?v=14"></script>
+<script src="js/voice.js?v=14"></script>
+<script src="js/story.js?v=14"></script>
 <script>LOADER.set(0.42)</script>
-<script src="js/game.js?v=13"></script>
-<script src="js/map.js?v=13"></script>
+<script src="js/game.js?v=14"></script>
+<script src="js/map.js?v=14"></script>
+<script src="js/gate.js?v=14"></script>
 </body>
 </html>

@@ -3,7 +3,7 @@
 let ctx=null,frame=0;
 const FONT='"Baloo Bhaijaan 2","Segoe UI",Tahoma,Arial,sans-serif';
 try{if(document.fonts&&document.fonts.load){document.fonts.load('800 24px "Baloo Bhaijaan 2"');document.fonts.load('700 14px "Baloo Bhaijaan 2"');}}catch(e){}
-const SET={vol:0.8,shake:1,diff:1};
+const SET={vol:0.8,shake:1,diff:1,voice:1,amb:1};
 try{Object.assign(SET,JSON.parse(localStorage.getItem('atlasSettings')||'{}'));}catch(e){}
 function saveSet(){try{localStorage.setItem('atlasSettings',JSON.stringify(SET));}catch(e){}}
 const DIFFS=[{name:'ساهلة',hp:0.75,dmg:0.7},{name:'عادية',hp:1,dmg:1},{name:'صعيبة',hp:1.3,dmg:1.3}];

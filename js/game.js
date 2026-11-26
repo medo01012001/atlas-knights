@@ -207,7 +207,7 @@ function hurtEnemy(e,dmg,dir,kb){
   if(e.hp<=0)killEnemy(e);
 }
 function killEnemy(e){
-  e.dead=true;
+  e.dead=true;TUT.kills++;
   const n=e.isBoss?30:e.d.gold;
   for(let i=0;i<n;i++)G.pick.push({type:'coin',x:e.x,y:e.y,z:20,vz:rnd(3,8),vx:rnd(-3.5,3.5),val:2+G.level,t:0});
   if(!e.isBoss&&Math.random()<0.07)G.pick.push({type:'heart',x:e.x,y:e.y,z:20,vz:5,vx:0,t:0});
@@ -990,6 +990,7 @@ function update(){
   else if(state==='shop')updShop();
   else if(state==='story')updStory();
   else updEnd();
+  try{tutTick();ambTick();}catch(e){}
   for(const k in pressed)delete pressed[k];
   frame++;
 }
@@ -1004,6 +1005,7 @@ function draw(){
   else if(state==='over')drawOver();
   else if(state==='story')drawStory();
   else drawWin();
+  if(state==='play'||state==='shop')drawTut();
 }
 let last=performance.now(),acc=0;
 function loop(now){

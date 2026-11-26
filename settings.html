@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/ui.css?v=12">
+<link rel="stylesheet" href="css/ui.css?v=13">
 <style>
 .wrap{max-width:720px;margin:28px auto 0}
 .val{min-width:54px;text-align:center}
@@ -31,6 +31,14 @@
       <div class="row">
         <div class="lab">⚔ الصعوبة<small>قوة الأعداء والبوس</small></div>
         <div class="seg" id="diff"></div>
+      </div>
+      <div class="row">
+        <div class="lab">🗣 أصوات الحكاية<small>الراوي والشخصيات كيهضرو</small></div>
+        <button class="toggle" id="voice" aria-label="أصوات الحكاية"></button>
+      </div>
+      <div class="row">
+        <div class="lab">🌿 أصوات الطبيعة<small>الريح، الطيور، البحر... بلا موسيقى</small></div>
+        <button class="toggle" id="amb" aria-label="أصوات الطبيعة"></button>
       </div>
       <div class="row">
         <div class="lab">📳 اهتزاز الشاشة<small>فاش كتكون شي ضربة قوية</small></div>
@@ -58,10 +66,10 @@
   </div></div>
 </div>
 <span class="pill green saved" id="saved">✔ تسجل</span>
-<script src="js/core.js?v=12"></script>
-<script src="js/data.js?v=12"></script>
-<script src="js/letters.js?v=12"></script>
-<script src="js/site.js?v=12"></script>
+<script src="js/core.js?v=13"></script>
+<script src="js/data.js?v=13"></script>
+<script src="js/letters.js?v=13"></script>
+<script src="js/site.js?v=13"></script>
 <script>
 'use strict';
 const $=id=>document.getElementById(id);
@@ -81,6 +89,9 @@ showDiff();
 function showShake(){$('shake').classList.toggle('on',!!SET.shake);$('shake').setAttribute('aria-pressed',!!SET.shake);}
 $('shake').onclick=()=>{SET.shake=SET.shake?0:1;showShake();saved();clickSnd();};
 showShake();
+// voices & nature
+for(const k of ['voice','amb']){const el=$(k),show=()=>{el.classList.toggle('on',!!SET[k]);el.setAttribute('aria-pressed',!!SET[k]);};
+  el.onclick=()=>{SET[k]=SET[k]?0:1;show();saved();clickSnd();};show();}
 // fullscreen
 $('fs').onclick=()=>{try{if(!document.fullscreenElement)document.documentElement.requestFullscreen();else document.exitFullscreen();}catch(e){}};
 document.addEventListener('fullscreenchange',()=>{$('fs').textContent=document.fullscreenElement?'خروج':'شاشة كاملة';});

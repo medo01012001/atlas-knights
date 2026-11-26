@@ -3,7 +3,7 @@
    The tale of the Great Book: an intro, one chapter each time you free a letter, the gate of the dark castle, and the ending.
    A slide: {w: speaker, text, cast?, fx?, bg?}
    w: a letter index | 'p' (player 1's letter) | 'n' (narrator) | 'd' (the Dark Lord) | 'h' (the Hamza) */
-const STORY={slides:[],i:0,ch:0,t:0,done:null,title:'',cast:[],bg:0};
+const STORY={slides:[],i:0,ch:0,t:0,done:null,title:'',cast:[],bg:0,voiced:false};
 
 const MEET={ // what each letter says when you free it
   0:'الألف! كنت عارف بلي شي حد غادي يجي يفكني... يالاه نكملو الطريق مع بعض!',
@@ -81,21 +81,23 @@ function drawCover(im,t){ // fill the screen, with a slow camera push-in
 function playStory(slides,done,title){
   if(!slides||!slides.length){done&&done();return;}
   for(const sl of slides)storyImg(sl.img); // start loading the pictures
+  preloadLines(slides); // and the recorded voices
   Object.assign(STORY,{slides,i:0,ch:0,t:0,done,title:title||'',cast:G?G.roster.map(h=>h.idx):[],bg:G?LV[G.level].bg:0});
   state='story';
 }
 function storyNext(){
   const s=STORY.slides[STORY.i];
   if(s&&STORY.ch<s.text.length){STORY.ch=s.text.length;return;}
-  STORY.i++;STORY.ch=0;STORY.t=0;SFX.coin();
+  STORY.i++;STORY.ch=0;STORY.t=0;stopVoice();SFX.coin();
   if(STORY.i>=STORY.slides.length)storyEnd();
 }
-function storyEnd(){const d=STORY.done;STORY.done=null;STORY.slides=[];if(d)d();}
+function storyEnd(){stopVoice();const d=STORY.done;STORY.done=null;STORY.slides=[];if(d)d();}
 function updStory(){
   const s=STORY.slides[STORY.i];if(!s){storyEnd();return;}
+  if(STORY.t===0){const w=spIdx(s.w);STORY.voiced=sayLine(s.text,w!=null?w:s.w);}
   STORY.t++;
   const before=Math.floor(STORY.ch);STORY.ch=Math.min(s.text.length,STORY.ch+0.85);
-  if(Math.floor(STORY.ch)!==before&&before%3===0&&s.text[before]!==' ')beep(s.w==='d'?260:s.w==='h'?1100:760,0.03,'square',0.012);
+  if(!STORY.voiced&&Math.floor(STORY.ch)!==before&&before%3===0&&s.text[before]!==' '){const w=spIdx(s.w);babble(w!=null?w:s.w);}
   if(pressed.Enter||pressed.NumpadEnter||pressed.Space||tap(0,'a')||tap(1,'a'))storyNext();
   else if(pressed.Escape)storyEnd();
 }

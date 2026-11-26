@@ -8,3 +8,5 @@ __pycache__/
 
 # original downloads of the home art (resized copies live in assets/home/)
 Cartoon_*.jpg
+assets/voice/*.wav
+assets/voice/raw/

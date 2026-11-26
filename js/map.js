@@ -23,7 +23,9 @@ const PROG={cleared:0,gold:0,upg:null,intro:0,joins:{},gate:0,ending:0,team:[0]}
 try{const v=JSON.parse(localStorage.getItem('atlasProg')||'null');if(v&&typeof v==='object')Object.assign(PROG,v);}catch(e){}
 PROG.cleared=clamp(PROG.cleared|0,0,LV.length);
 gold=Math.max(0,PROG.gold|0);
-if(Array.isArray(PROG.upg))PROG.upg.forEach((u,i)=>{if(upg[i]&&u)for(const k of ['dmg','hp','sk'])upg[i][k]=clamp(u[k]|0,0,5);});
+// saves from before the 20-level shop (uv<2) had 5 big steps: one old step = 4 new ones
+if(Array.isArray(PROG.upg))PROG.upg.forEach((u,i)=>{if(upg[i]&&u)for(const k of UPK)upg[i][k]=clamp((u[k]|0)*(PROG.uv>=2||!['dmg','hp','sk'].includes(k)?1:4),0,UPMAX);});
+PROG.uv=2;
 function saveProg(){PROG.gold=gold;PROG.upg=upg;try{localStorage.setItem('atlasProg',JSON.stringify(PROG));}catch(e){}}
 function team(){ // the letters you take on the field, in order (first = player 1)
   let t=(Array.isArray(PROG.team)?PROG.team:[]).filter((i,k,a)=>FOUND.includes(i)&&a.indexOf(i)===k).slice(0,MAX_FIELD);

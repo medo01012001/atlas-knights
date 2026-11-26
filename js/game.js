@@ -109,7 +109,8 @@ const LV=[
 
 /* ================= STATE ================= */
 let state='menu',G=null;
-const upg=HEROES.map(()=>({dmg:0,hp:0,sk:0}));
+const UPK=['dmg','hp','sk','spd','arm','crit'],UPMAX=20; // shop rows: power, health, skills, speed, armour, critical
+const upg=HEROES.map(()=>({dmg:0,hp:0,sk:0,spd:0,arm:0,crit:0}));
 let gold=0;
 const menu={sel:0,p2sel:1,mode:new URLSearchParams(location.search).get('mode')==='1'?1:0}; // mode 0 = alone, 1 = with a friend
 const MAX_FIELD=4; // letters on screen at the same time; the others wait on the bench
@@ -120,10 +121,14 @@ function discover(i){if(FOUND.includes(i))return;FOUND.push(i);FOUND.sort((a,b)=
 function nextLetter(have){for(let i=0;i<HEROES.length;i++)if(!have.includes(i))return i;return null;}
 const shop={hero:0,row:1,from:'play'};
 
-function hMax(h){return Math.round(h.def.hp*(1+0.2*upg[h.idx].hp));}
-function hDmg(h){return h.def.dmg*(1+0.2*upg[h.idx].dmg)*(h.buffT>0?1.5:1);}
-function hCd(h,base){return Math.round(base*(1-0.1*upg[h.idx].sk));}
-function hPow(h){return 1+0.15*upg[h.idx].sk;}
+/* each level adds a little: 20 levels of health or power = double, 20 levels of skills = half the wait and +80% strength */
+function hMax(h){return Math.round(h.def.hp*(1+0.05*upg[h.idx].hp));}
+function hCrit(h){return 0.015*upg[h.idx].crit;}
+function hDmg(h){const c=Math.random()<hCrit(h);if(c&&G)addText(h.x,h.y,96,'ضربة حرجة!','#ffd24a');return h.def.dmg*(1+0.05*upg[h.idx].dmg)*(h.buffT>0?1.5:1)*(c?1.8:1);}
+function hCd(h,base){return Math.round(base*(1-0.025*upg[h.idx].sk));}
+function hPow(h){return 1+0.04*upg[h.idx].sk;}
+function hSpd(h){return h.def.spd*(1+0.015*upg[h.idx].spd);}
+function hArm(h){return 1-0.015*upg[h.idx].arm;}
 
 function makeHero(i,ctrl){
   return {kind:'hero',def:HEROES[i],idx:i,ctrl,x:0,y:0,z:0,face:1,hp:1,cdA:0,cdK:0,cdL:0,atkT:0,atkMax:1,
@@ -246,6 +251,7 @@ function areaHit(x,y,r,dmg,kb,fn){
 function hurtHero(h,dmg,dir){
   if(h.down||h.inv>0||state!=='play')return;
   if(h.def.id==='guard'&&h.face===-dir)dmg*=0.6;
+  dmg*=hArm(h);
   dmg=Math.max(1,Math.round(dmg));
   h.hp-=dmg;h.flash=8;h.hurtT=26;h.kx=dir*4;h.inv=22;
   addText(h.x,h.y,80,'-'+dmg,'#ff6b6b');SFX.hurt();
@@ -427,7 +433,7 @@ function updHero(h){
     meleeHit(h,45,32,hDmg(h)*2.5*hPow(h),7,0,h.dashSet);
     if(frame%2===0)part(h.x-h.face*10,h.y,40,'#9fd0ff',2,1,5,15);
   }else{
-    const sp=h.def.spd*(h.atkT>0&&h.def.type==='melee'?0.35:1)*(h.buffT>0?1.15:1);
+    const sp=hSpd(h)*(h.atkT>0&&h.def.type==='melee'?0.35:1)*(h.buffT>0?1.15:1);
     let mx=inp.mx,my=inp.my;if(mx&&my){mx*=0.75;my*=0.75;}
     h.x+=mx*sp;h.y+=my*sp*0.75;
     if(inp.mx)h.face=inp.mx>0?1:-1;
@@ -671,20 +677,20 @@ function updPlay(){
 
 /* ================= MENU / SHOP / END ================= */
 function goHome(){location.href='index.html';}
-function upCost(lv){return 30+lv*30;}
+function upCost(lv){return 8+lv*5+Math.floor(lv*lv/5);}
 function shopBuy(c,r){
-  const key=['dmg','hp','sk'][r],u=upg[G.roster[c].idx],lv=u[key];
-  if(lv>=5||gold<upCost(lv)){SFX.no();}else{gold-=upCost(lv);u[key]++;SFX.buy();saveProg();}
+  const key=UPK[r],u=upg[G.roster[c].idx],lv=u[key];
+  if(lv>=UPMAX||gold<upCost(lv)){SFX.no();}else{gold-=upCost(lv);u[key]++;SFX.buy();saveProg();}
 }
 function updShop(){
   const N=G.roster.length;shop.hero=clamp(shop.hero|0,0,N-1);
   for(const p of [0,1]){
     if(tap(p,'left')){shop.hero=(shop.hero+1)%N;SFX.coin();} // letters run right-to-left
     if(tap(p,'right')){shop.hero=(shop.hero+N-1)%N;SFX.coin();}
-    const ui=[1,0,2,3],k=Math.max(0,ui.indexOf(shop.row|0)); // screen order: health, power, skills, then the next button
-    if(tap(p,'up')){shop.row=ui[(k+3)%4];SFX.coin();}
-    if(tap(p,'down')){shop.row=ui[(k+1)%4];SFX.coin();}
-    if(tap(p,'a')){if(shop.row===3){shopNext();return;}shopBuy(shop.hero,shop.row);}
+    const ui=[1,0,2,3,4,5,6],n=ui.length,k=Math.max(0,ui.indexOf(shop.row|0)); // screen order: health, power, skills, speed, armour, critical, then the next button
+    if(tap(p,'up')){shop.row=ui[(k+n-1)%n];SFX.coin();}
+    if(tap(p,'down')){shop.row=ui[(k+1)%n];SFX.coin();}
+    if(tap(p,'a')){if(shop.row===6){shopNext();return;}shopBuy(shop.hero,shop.row);}
   }
   if(pressed.Enter||pressed.NumpadEnter)shopNext();
   else if(pressed.Escape)resetMenu();

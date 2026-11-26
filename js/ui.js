@@ -264,51 +264,53 @@ function drawShop(){
     for(let k=0;k<N;k++){const dx=wx+ww/2+((N-1)/2-k)*16;ctx.fillStyle=INK;circ(dx,wy+wh+12,5.5);ctx.fillStyle=k===shop.hero?'#ffd24a':'#4a4e70';circ(dx,wy+wh+12,4);}
   }
   // name, level, numbers
-  const iy=wy+wh+26,lvl=1+u.dmg+u.hp+u.sk;
+  const iy=wy+wh+26,lvl=1+UPK.reduce((a,k)=>a+u[k],0);
   ctx.fillStyle='rgba(0,0,0,.28)';rp(wx,iy,ww,ch-(iy-top)-16,10);ctx.fill();
   txt(D.name,wx+ww-12,iy+22,22,'#fff','right');
   txt((D.type==='melee'?'⚔ من قريب':'🏹 من بعيد'),wx+ww-12,iy+48,12,'#c8c4dc','right',false);
   txt('مستوى '+lvl,wx+56,iy+22,18,'#ffd24a');
-  const hpN=Math.round(D.hp*(1+0.2*u.hp)),dmN=Math.round(D.dmg*(1+0.2*u.dmg)),skN=Math.round(15*u.sk);
-  const lines=[['❤',hpN,'+'+Math.round(D.hp*0.2),1,u.hp],['⚔',dmN,'+'+(Math.round(D.dmg*2)/10),0,u.dmg],['✨','+'+skN+'%','+15%',2,u.sk]];
-  lines.forEach(([ic,v,plus,r,lv],k)=>{const ly=iy+76+k*26;
-    txt(ic,wx+ww-22,ly,15,'#fff','center',false);txt(''+v,wx+ww-42,ly,16,'#fff','right');
-    if(row===r&&lv<5)txt(plus,wx+ww-118,ly,15,'#7dff6a','right');});
+  const pc=v=>(Math.round(v*10)/10)+'%';
+  const lines=[['❤',Math.round(D.hp*(1+0.05*u.hp)),'+'+Math.round(D.hp*0.05),1],['⚔',Math.round(D.dmg*(1+0.05*u.dmg)*10)/10,'+'+(Math.round(D.dmg*0.5)/10),0],['✨','+'+4*u.sk+'%','+4%',2],
+    ['👟','+'+pc(1.5*u.spd),'+1.5%',3],['🛡','-'+pc(1.5*u.arm),'-1.5%',4],['🎯',pc(1.5*u.crit),'+1.5%',5]];
+  lines.forEach(([ic,v,plus,r],k)=>{const col=k%2,ly=iy+74+Math.floor(k/2)*25,cx0=col?wx+ww/2-6:wx+ww-6;
+    txt(ic,cx0-14,ly,14,'#fff','center',false);txt(''+v,cx0-30,ly,15,'#fff','right');
+    if(row===r&&u[UPK[r]]<UPMAX)txt(plus,cx0-30-tw(''+v,15)-8,ly,13,'#7dff6a','right');});
   // ---- upgrades (left) ----
   const lx=14,lw=px-lx-14;
   panel(lx,top,lw,ch,{frame:FRAMES.gold,r:14});
   const sec=(y,label)=>{txt(label,lx+lw-20,y,16,'#ffd24a','right');setFont(16);const w=ctx.measureText(label).width;ctx.strokeStyle='rgba(255,210,74,.35)';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(lx+20,y);ctx.lineTo(lx+lw-30-w,y);ctx.stroke();};
-  sec(top+22,'القدرات');
-  const rowsD=[['❤','الصحة','hp','#e8404a',1],['⚔','القوة','dmg','#c86a10',0],['✨','المهارات','sk','#2a8ad0',2]]; // last = shopBuy row
-  const bW=Math.min(120,lw*0.24),rh=54;
-  rowsD.forEach(([ic,nm,key,col,r],k)=>{
-    const y=top+40+k*(rh+8),lv=u[key],cost=upCost(lv),sel=row===r,max=lv>=5,ok=gold>=cost;
-    ctx.fillStyle=sel?'rgba(255,210,74,.16)':'rgba(0,0,0,.25)';rp(lx+14,y,lw-28,rh,10);ctx.fill();
+  sec(top+20,'القدرات');
+  const rowsD=[['❤','الصحة','#e8404a',1],['⚔','القوة','#c86a10',0],['✨','المهارات','#2a8ad0',2],['👟','السرعة','#3aa04a',3],['🛡','الدرع','#5a7ab0',4],['🎯','الضربة الحرجة','#c8322a',5]]; // last = shopBuy row
+  const bW=Math.min(110,lw*0.22),rh=36;
+  rowsD.forEach(([ic,nm,col,r],k)=>{
+    const key=UPK[r],y=top+36+k*(rh+5),lv=u[key],cost=upCost(lv),sel=row===r,max=lv>=UPMAX,ok=gold>=cost;
+    ctx.fillStyle=sel?'rgba(255,210,74,.16)':'rgba(0,0,0,.25)';rp(lx+14,y,lw-28,rh,9);ctx.fill();
     if(sel){ctx.strokeStyle='#ffd24a';ctx.lineWidth=2.5;ctx.stroke();}
     hit(lx+14,y,lw-28-bW-10,rh,()=>{shop.row=r;});
-    const ix=lx+lw-14-50;ctx.fillStyle=INK;rp(ix,y+5,44,44,9);ctx.fill();ctx.fillStyle=vgrad(y+7,y+47,['#fff0c8','#d8b070']);rp(ix+2,y+7,40,40,8);ctx.fill();
-    txt(ic,ix+22,y+28,22,col,false);
-    txt(nm,ix-10,y+15,13,'#fff','right',false);
-    const bx=lx+14+bW+20,bw=ix-14-bx,segW=bw/5;
-    ctx.fillStyle=INK;rp(bx-3,y+26,bw+6,20,6);ctx.fill();
-    for(let s=0;s<5;s++){const sx=bx+bw-(s+1)*segW;ctx.fillStyle=s<lv?vgrad(y+28,y+44,GOLDB):'#3a3450';rp(sx+2,y+28,segW-4,16,3);ctx.fill();}
-    const btx=lx+22,bty=y+9;
-    if(max)btn(btx,bty,bW,32,'MAX ✔',null,'green',{size:15});
-    else{btn(btx,bty,bW,32,'',()=>{shop.row=r;shopBuy(shop.hero,r);},ok?'gold':'dark');
-      coin(btx+bW/2+tw(''+cost,16)/2+4,bty+16,8);txt(''+cost,btx+bW/2-8,bty+17,16,ok?'#fff':'#9a96b0',ok?'#6a3000':INK);}
+    const ix=lx+lw-14-38;ctx.fillStyle=INK;rp(ix,y+3,30,30,7);ctx.fill();ctx.fillStyle=vgrad(y+5,y+31,['#fff0c8','#d8b070']);rp(ix+2,y+5,26,26,6);ctx.fill();
+    txt(ic,ix+15,y+18,15,col,false);
+    const bx=lx+14+bW+18,bw=ix-12-bx,segW=bw/UPMAX;
+    txt(nm,ix-8,y+10,12,'#fff','right',false);
+    txt(UPMAX+' / '+lv,bx,y+10,11,max?'#7dff6a':'#c8c4dc','left',false);
+    ctx.fillStyle=INK;rp(bx-2,y+19,bw+4,13,4);ctx.fill();
+    for(let q=0;q<UPMAX;q++){const sx=bx+bw-(q+1)*segW;ctx.fillStyle=q<lv?vgrad(y+21,y+30,q%5===4?['#fff8c0','#ffcf3a']:GOLDB):'#3a3450';rp(sx+0.8,y+21,segW-1.6,9,2);ctx.fill();}
+    const btx=lx+22,bty=y+5;
+    if(max)btn(btx,bty,bW,26,'MAX ✔',null,'green',{size:13});
+    else{btn(btx,bty,bW,26,'',()=>{shop.row=r;shopBuy(shop.hero,r);},ok?'gold':'dark');
+      coin(btx+bW/2+tw(''+cost,14)/2+4,bty+13,7);txt(''+cost,btx+bW/2-7,bty+14,14,ok?'#fff':'#9a96b0',ok?'#6a3000':INK);}
   });
-  const sy=top+40+3*(rh+8)+18;
+  const sy=top+36+6*(rh+5)+12;
   sec(sy,'المهارات');
   [[KL.KeyK,D.k.name,D.kd],[KL.KeyL,D.l.name,D.ld]].forEach(([key,nm,ds],k)=>{
-    const y=sy+16+k*(rh+6);
-    ctx.fillStyle='rgba(0,0,0,.25)';rp(lx+14,y,lw-28,rh,10);ctx.fill();
-    keycap(lx+lw-14-26,y+rh/2,key,16);
-    txt(nm,lx+lw-64,y+16,14,'#bfe0ff','right',false);
-    wrapLines(ds,lw-190,11).slice(0,2).forEach((s,j)=>txt(s,lx+lw-64,y+33+j*14,11,'#c8c4dc','right',false));
-    for(let s=0;s<5;s++)diamond(lx+34+s*15,y+rh/2,5,s<u.sk?'#7fd6ff':'#3a3450');
+    const y=sy+12+k*40;
+    ctx.fillStyle='rgba(0,0,0,.25)';rp(lx+14,y,lw-28,36,9);ctx.fill();
+    keycap(lx+lw-14-22,y+18,key,13);
+    txt(nm,lx+lw-50,y+11,13,'#bfe0ff','right',false);
+    txt(wrapLines(ds,lw-150,11)[0],lx+lw-50,y+27,11,'#c8c4dc','right',false);
+    txt('✨ +'+4*u.sk+'%',lx+30,y+18,12,'#7fd6ff','left',false);
   });
   // ---- bottom ----
-  const sel3=row===3;
+  const sel3=row===6;
   btn(W/2-10-210,466,210,44,'🗺 الخريطة',resetMenu,'dark',{size:19});
   btn(W/2+10,466,240,44,fromMap?'⚔ ابدا المرحلة '+(menu.sel+1):'➜ المرحلة الجاية',shopNext,sel3?'green':'gold',{size:20,glow:sel3});
   txt(padCount?'🎮 ◀▶ بدل الحرف  •  ▲▼ ختار  •  A شري  •  B الخريطة':'⌨ '+KL.KeyA+'/'+KL.KeyD+' بدل الحرف  •  '+KL.KeyW+'/'+KL.KeyS+' ختار  •  '+KL.KeyJ+' شري  •  Enter كمل  •  Esc الخريطة',W/2,528,12,'#c8c4dc','center',false);

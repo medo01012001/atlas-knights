@@ -122,11 +122,12 @@ function mapXY(lon,lat){return [MP.x+(lon+18)*MP.s,MP.y+(40-lat)*MP.s*1.12];}
 function mapPath(pts,close){ctx.beginPath();pts.forEach(([lo,la],k)=>{const [x,y]=mapXY(lo,la);k?ctx.lineTo(x,y):ctx.moveTo(x,y);});if(close!==false)ctx.closePath();}
 function drawMap(x,y,w,h){
   const s=Math.min(w/80,h/(32*1.12));MP={s,x:x+(w-80*s)/2,y:y+(h-32*1.12*s)/2};
+  cached('map|'+[x,y,w,h].map(Math.round).join(','),x,y,w,h,()=>{
   ctx.save();rp(x,y,w,h,10);ctx.clip();
   // sea
   ctx.fillStyle=vgrad(y,y+h,['#3d86b4','#2a6a96','#1f557c']);ctx.fillRect(x,y,w,h);
   ctx.strokeStyle='rgba(255,255,255,.13)';ctx.lineWidth=1.5;
-  for(let k=0;k<40;k++){const wx=x+srand(k*3.1)*w,wy=y+srand(k*7.7)*h,o=Math.sin(frame*0.03+k)*3;ctx.beginPath();ctx.moveTo(wx-8+o,wy);ctx.quadraticCurveTo(wx+o,wy-4,wx+8+o,wy);ctx.stroke();}
+  for(let k=0;k<40;k++){const wx=x+srand(k*3.1)*w,wy=y+srand(k*7.7)*h,o=0;ctx.beginPath();ctx.moveTo(wx-8+o,wy);ctx.quadraticCurveTo(wx+o,wy-4,wx+8+o,wy);ctx.stroke();}
   // land: shadow, coast glow, sand
   ctx.save();ctx.translate(2,4);ctx.fillStyle='rgba(0,0,0,.25)';for(const p of LAND){mapPath(p);ctx.fill();}ctx.restore();
   ctx.strokeStyle='rgba(190,235,255,.35)';ctx.lineWidth=7;for(const p of LAND){mapPath(p);ctx.stroke();}
@@ -147,6 +148,8 @@ function drawMap(x,y,w,h){
   txt('بحر العرب',...mapXY(57.5,14.6),11,'#d6efff','center',false);ctx.globalAlpha=1;
   // compass
   {const [cx,cy]=mapXY(-13,10),r=s*2.2;ctx.fillStyle='rgba(255,240,200,.85)';star8(cx,cy,r,'rgba(255,240,200,.8)');ctx.fillStyle='#b8322a';tri(cx-r*0.28,cy,cx,cy-r*1.25,cx+r*0.28,cy);ctx.fillStyle='#f2dcaa';tri(cx-r*0.28,cy,cx,cy+r*1.25,cx+r*0.28,cy);txt('ش',cx,cy-r*1.6,11,'#fff','center');}
+  ctx.restore();});
+  ctx.save();rp(x,y,w,h,10);ctx.clip();
   // the road between countries
   const P=COUNTRY.map(o=>mapXY(o.lon,o.lat));
   for(let k=0;k<P.length-1;k++){
@@ -179,8 +182,7 @@ function drawMap(x,y,w,h){
 
 /* ---------- the stage-select screen ---------- */
 function drawMenu(){
-  ctx.fillStyle=vgrad(0,H,['#241a46','#151230','#0c0a1e']);ctx.fillRect(0,0,W,H);
-  ctx.globalAlpha=0.05;ctx.fillStyle=zellige();ctx.fillRect(0,0,W,H);ctx.globalAlpha=1;
+  cached('menubg',0,0,W,H,()=>{ctx.fillStyle=vgrad(0,H,['#241a46','#151230','#0c0a1e']);ctx.fillRect(0,0,W,H);ctx.globalAlpha=0.05;ctx.fillStyle=zellige();ctx.fillRect(0,0,W,H);ctx.globalAlpha=1;});
   // header
   btn(14,10,44,38,'🏠',goHome,'dark',{size:18});
   btn(66,10,44,38,'⛶',toggleFS,'dark',{size:18});
@@ -213,7 +215,7 @@ function drawMenu(){
   panel(ix,by,iw,bh,{frame:FRAMES.blue,r:14});
   const n=menu.sel,L=LV[n],C=COUNTRY[n],open=unlocked(n);
   const tw_=Math.min(170,iw*0.32),th=tw_*0.6,tx=ix+iw-tw_-14,ty=by+14;
-  ctx.save();rp(tx,ty,tw_,th,8);ctx.clip();ctx.translate(tx,ty);ctx.scale(tw_/W,th/H);drawBG(L.bg,frame*0.8);ctx.restore();
+  cached('thumb'+L.bg+'|'+Math.round(tw_),tx,ty,tw_,th,()=>{rp(tx,ty,tw_,th,8);ctx.clip();ctx.translate(tx,ty);ctx.scale(tw_/W,th/H);drawBG(L.bg,0);});
   if(!open){ctx.fillStyle='rgba(10,8,24,.65)';rp(tx,ty,tw_,th,8);ctx.fill();txt('🔒',tx+tw_/2,ty+th/2,26,'#fff','center',false);}
   ctx.strokeStyle=INK;ctx.lineWidth=2.5;rp(tx,ty,tw_,th,8);ctx.stroke();
   txt('المرحلة '+(n+1),tx+tw_/2,ty+th+14,12,'#bfe0ff','center',false);
@@ -277,5 +279,8 @@ function drawTeam(){
   txt('كليك على حرف باش تزيدو ولا تحيدو • ⇨ باش تقدمو • '+KL.KeyJ+' زيد/حيد • '+KL.KeyK+' قدّم',W/2,py+ph-66,12,'#c8c4dc','center',false);
   btn(W/2-90,py+ph-44,180,36,'✔ صافي',()=>{menu.team=false;SFX.coin();},'green',{size:17});
 }
+
+// load the story pictures in the background while you look at the map, so no chapter waits for them
+addEventListener('load',()=>setTimeout(()=>{for(const k of ['book','theft','scatter','dawn','cage','gate','armor','unite']){storyImg(k);const im=STORY_IMG[k];if(im&&im.decode)im.decode().catch(()=>{});}},300));
 
 requestAnimationFrame(loop);

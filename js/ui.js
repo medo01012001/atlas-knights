@@ -21,7 +21,24 @@ function zellige(){ // faint Moroccan star pattern, built once
   g.setTransform(1,0,0,1,0,0);g.beginPath();for(const [a,b] of [[0,0],[48,0],[0,48],[48,48]]){g.moveTo(a-7,b);g.lineTo(a,b-7);g.lineTo(a+7,b);g.lineTo(a,b+7);g.closePath();}g.stroke();
   _zel=ctx.createPattern(c,'repeat');return _zel;
 }
-function vignette(a){const g=ctx.createRadialGradient(W/2,H/2,H*0.35,W/2,H/2,W*0.75);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,'+a+')');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);}
+/* Static layers (backgrounds, the map, patterns) are drawn once into an offscreen canvas at the real
+   pixel size, then copied each frame: copying is cheap, redrawing gradients and paths every frame is not. */
+let _layers={},_layerN=0;
+function cached(key,x,y,w,h,fn){
+  const k=cv.width/W,id=key+'|'+W+'|'+cv.width;
+  let c=_layers[id];
+  if(!c){
+    if(++_layerN>60){_layers={};_layerN=1;}
+    c=document.createElement('canvas');c.width=Math.max(1,Math.ceil(w*k));c.height=Math.max(1,Math.ceil(h*k));
+    const g=c.getContext('2d'),old=ctx,hits=UI.hits.length;ctx=g;g.setTransform(k,0,0,k,-x*k,-y*k);g.direction='rtl';
+    try{fn();}finally{ctx=old;UI.hits.length=hits;}
+    _layers[id]=c;
+  }
+  ctx.drawImage(c,x,y,w,h);
+}
+function vignette(a){cached('vig'+a,0,0,W,H,()=>{const g=ctx.createRadialGradient(W/2,H/2,H*0.35,W/2,H/2,W*0.75);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,'+a+')');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);});}
+try{document.fonts.addEventListener('loadingdone',()=>{_layers={};_layerN=0;});document.fonts.ready.then(()=>{_layers={};_layerN=0;});}catch(e){} // redraw cached text once the Arabic font is here
+function zelLayer(){cached('zel',0,0,W,H,()=>{ctx.fillStyle=zellige();ctx.fillRect(0,0,W,H);});}
 
 /* o: {frame, r, b (border), top, bot, pattern, patA, noCorners} */
 function panel(x,y,w,h,o){
@@ -32,7 +49,7 @@ function panel(x,y,w,h,o){
   ctx.fillStyle=vgrad(y,y+h,o.frame||FRAMES.gold);rp(x,y,w,h,r);ctx.fill();
   ctx.fillStyle=INK;rp(x+b-1.5,y+b-1.5,w-2*b+3,h-2*b+3,ir+1);ctx.fill();
   ctx.fillStyle=vgrad(y+b,y+h-b,[o.top||'#2c3266',o.bot||'#12132c']);rp(x+b,y+b,w-2*b,h-2*b,ir);ctx.fill();
-  if(o.pattern!==false){ctx.save();rp(x+b,y+b,w-2*b,h-2*b,ir);ctx.clip();ctx.globalAlpha=o.patA||0.06;ctx.fillStyle=zellige();ctx.fillRect(x,y,w,h);ctx.restore();}
+  if(o.pattern!==false){ctx.save();rp(x+b,y+b,w-2*b,h-2*b,ir);ctx.clip();ctx.globalAlpha=o.patA||0.06;zelLayer();ctx.restore();}
   ctx.fillStyle='rgba(255,255,255,.06)';rp(x+b,y+b,w-2*b,Math.min(h*0.42,44),ir);ctx.fill();
   if(!o.noCorners&&w>70&&h>70)for(const [cx,cy] of [[x+3,y+3],[x+w-3,y+3],[x+3,y+h-3],[x+w-3,y+h-3]]){star8(cx,cy,8,INK);star8(cx,cy,5.5,'#ffd24a');}
   ctx.restore();
@@ -215,8 +232,8 @@ function drawHUD(){
   }
 }
 function drawShop(){
-  drawBG(LV[G.level].bg,0);
-  ctx.fillStyle='rgba(8,6,20,.7)';ctx.fillRect(0,0,W,H);vignette(0.5);
+  const bgN=LV[G.level].bg;
+  cached('shopbg'+bgN,0,0,W,H,()=>{drawBG(bgN,0);ctx.fillStyle='rgba(8,6,20,.7)';ctx.fillRect(0,0,W,H);vignette(0.5);});
   const N=G.roster.length;shop.hero=clamp(shop.hero|0,0,N-1);
   const hr=G.roster[shop.hero],li=hr.idx,D=HEROES[li],L=LET[li],u=upg[li],bench=G.bench.includes(hr),row=shop.row|0;
   // header
@@ -229,7 +246,7 @@ function drawShop(){
   const pw=Math.min(340,Math.round(W*0.36)),px=W-14-pw;
   panel(px,top,pw,ch,{frame:FRAMES.gold,r:14});
   const wx=px+16,wy=top+16,ww=pw-32,wh=178;
-  ctx.save();rp(wx,wy,ww,wh,10);ctx.clip();ctx.translate(wx,wy);ctx.scale(ww/W*1.6,wh/H*1.6);ctx.translate(-W*0.1,-H*0.32);drawBG(LV[G.level].bg,frame*0.3);ctx.restore();
+  cached('shopwin'+bgN+'|'+ww,wx,wy,ww,wh,()=>{rp(wx,wy,ww,wh,10);ctx.clip();ctx.translate(wx,wy);ctx.scale(ww/W*1.6,wh/H*1.6);ctx.translate(-W*0.1,-H*0.32);drawBG(bgN,0);});
   ctx.save();rp(wx,wy,ww,wh,10);ctx.clip();
   ctx.fillStyle='rgba(0,0,0,.35)';ell(wx+ww/2,wy+wh-20,48,11);ctx.fill();
   const t=frame%140,atk=t<16?t/16:-1;

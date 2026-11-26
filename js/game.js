@@ -1007,7 +1007,12 @@ function draw(){
 let last=performance.now(),acc=0;
 function loop(now){
   acc+=Math.min(100,now-last);last=now;
-  while(acc>=1000/60){update();acc-=1000/60;}
-  draw();requestAnimationFrame(loop);
+  requestAnimationFrame(loop); // scheduled first: an error below can never stop the game
+  try{
+    let steps=0;
+    while(acc>=1000/60&&steps<4){update();acc-=1000/60;steps++;}
+    if(steps>=4)acc=0; // a slow device skips time instead of piling up work
+    draw();
+  }catch(e){console.error(e);}
 }
 // the loop starts at the end of map.js, once every script is loaded

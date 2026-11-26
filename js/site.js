@@ -53,7 +53,7 @@ addEventListener('keydown',e=>{if(e.key==='Escape'&&!document.body.dataset.home)
         if(Math.abs(ry)>0.25)scrollBy(0,ry*14);
         if(s.a&&!prev.a){const ae=curEl();if(ae&&ae.matches&&ae.matches(sel)&&ae.click){used=true;document.body.classList.add('pad');ae.click();}}
         if(s.back&&!prev.back){const m=document.querySelector('.modal:not(.hide)');if(m)m.classList.add('hide');else if(!document.body.dataset.home)go('index.html');}
-        if(s.start&&!prev.start&&document.body.dataset.home)go('game.html?mode=0');
+        if(s.start&&!prev.start&&document.body.dataset.home&&!document.querySelector('.modal:not(.hide)'))(window.homePlay?homePlay(0):go('game.html?mode=0'));
         prev=s;}}catch(e){}
     requestAnimationFrame(step);
   }

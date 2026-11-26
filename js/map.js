@@ -280,7 +280,15 @@ function drawTeam(){
   btn(W/2-90,py+ph-44,180,36,'✔ صافي',()=>{menu.team=false;SFX.coin();},'green',{size:17});
 }
 
-// load the story pictures in the background while you look at the map, so no chapter waits for them
-addEventListener('load',()=>setTimeout(()=>{for(const k of ['book','theft','scatter','dawn','cage','gate','armor','unite']){storyImg(k);const im=STORY_IMG[k];if(im&&im.decode)im.decode().catch(()=>{});}},300));
+// loading: the font, then the story pictures (so no chapter waits for them), with the bar on the loading screen
+(function(){
+  const L=window.LOADER||{set(){},done(){}},keys=['book','theft','scatter','dawn','cage','gate','armor','unite'];
+  L.set(0.5);
+  let n=0;const step=()=>{n++;L.set(0.6+0.4*n/keys.length);if(n>=keys.length)L.done();};
+  const pics=()=>keys.forEach(k=>{storyImg(k);const im=STORY_IMG[k];
+    if(im.complete&&im.naturalWidth)step();else{im.addEventListener('load',step,{once:true});im.addEventListener('error',step,{once:true});}});
+  const fonts=document.fonts&&document.fonts.load?Promise.race([document.fonts.load('800 20px "Baloo Bhaijaan 2"'),new Promise(r=>setTimeout(r,2500))]):Promise.resolve();
+  fonts.catch(()=>{}).then(()=>{L.set(0.6);_layers={};_layerN=0;pics();});
+})();
 
 requestAnimationFrame(loop);

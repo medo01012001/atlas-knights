@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/ui.css?v=10">
+<link rel="stylesheet" href="css/ui.css?v=12">
 <style>
 html,body{height:100%;overflow:hidden}
 body{background:#5ec4f4}
@@ -51,6 +51,14 @@ body.has-art #scene{display:none}
 .foot{position:fixed;left:16px;bottom:12px;z-index:2;font-size:13px;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.45);display:flex;gap:12px;align-items:center}
 .foot .key{height:24px;min-width:24px;font-size:12px}
 .corner{position:fixed;top:14px;left:14px;z-index:3}
+.pm-info{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:18px 0 22px}
+.pm-info div{background:rgba(0,0,0,.28);border-radius:12px;padding:8px 4px;box-shadow:inset 0 0 0 2px rgba(255,210,74,.25)}
+.pm-info b{display:block;font-size:22px;color:var(--gold);line-height:1.2}
+.pm-info small{font-size:13px;color:#d8d6ee;font-weight:700}
+.pm-info .where{grid-column:1/-1;font-size:17px;font-weight:800;color:#fff}
+.pm-btns{display:flex;flex-direction:column;gap:14px;align-items:stretch}
+.pm-btns .small{align-self:center}
+.pm-warn{font-size:17px;margin:18px 0 22px;line-height:1.7}
 @media (max-width:760px),(max-aspect-ratio:4/5){
   .side{width:100%;margin:0;justify-content:flex-start;padding:4vh 16px 0;gap:1.6vh}
   .brand .logo{font-size:15vw}
@@ -99,11 +107,32 @@ body.has-art #scene{display:none}
     </div>
   </nav>
 </main>
+<div class="modal hide" id="playModal" role="dialog" aria-modal="true" aria-labelledby="pmTitle">
+  <div class="panel"><span class="star s1"></span><span class="star s2"></span><span class="star s3"></span><span class="star s4"></span><div class="in">
+    <div id="pmMain">
+      <p style="margin:4px 0 10px"><span class="ribbon" id="pmTitle">▶ العب</span></p>
+      <div class="pm-info" id="pmInfo"></div>
+      <div class="pm-btns">
+        <button class="btn green big" id="pmCont">▶ كمل اللعب</button>
+        <button class="btn red" id="pmNew">✨ لعبة جديدة</button>
+        <button class="btn dark small" id="pmBack">→ رجوع</button>
+      </div>
+    </div>
+    <div id="pmSure" class="hide">
+      <p style="margin:4px 0 10px"><span class="ribbon">⚠ متأكد؟</span></p>
+      <p class="pm-warn">اللعبة الجديدة كتمسح التقدم كامل: المراحل، الحروف اللي لقيتي، الفلوس والقوة. هادشي ما كيرجعش.</p>
+      <div class="pm-btns">
+        <button class="btn red" id="pmYes">إيه، بدا من جديد</button>
+        <button class="btn dark" id="pmNo">لا، رجع</button>
+      </div>
+    </div>
+  </div></div>
+</div>
 <footer class="foot"><span><span class="key wide">Enter</span> ولا <span class="key wide">Start</span> باش تلعب</span><span>•</span><span>النسخة 1.1</span></footer>
-<script src="js/core.js?v=10"></script>
-<script src="js/data.js?v=10"></script>
-<script src="js/letters.js?v=10"></script>
-<script src="js/site.js?v=10"></script>
+<script src="js/core.js?v=12"></script>
+<script src="js/data.js?v=12"></script>
+<script src="js/letters.js?v=12"></script>
+<script src="js/site.js?v=12"></script>
 <script>
 'use strict';
 /* the splash: the six letters charging into battle against the shadow army */
@@ -174,7 +203,39 @@ body.has-art #scene{display:none}
   requestAnimationFrame(draw);
 })();
 document.getElementById('fs').onclick=()=>{try{if(!document.fullscreenElement)document.documentElement.requestFullscreen();else document.exitFullscreen();}catch(e){}};
-addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.target.closest('a,button'))go('game.html?mode=0');});
+/* play: continue the saved adventure or start a new one */
+const COUNTRIES=['المغرب','الجزائر','تونس','ليبيا','مصر','لبنان','سوريا','العراق','عُمان','اليمن','الربع الخالي'];
+function savedGame(){
+  let p=null,f=[0];
+  try{p=JSON.parse(localStorage.getItem('atlasProg')||'null');}catch(e){}
+  try{const v=JSON.parse(localStorage.getItem('atlasFound')||'[0]');if(Array.isArray(v))f=v;}catch(e){}
+  if(!p||!(p.cleared>0||p.intro||(p.gold|0)>0||f.length>1))return null;
+  return {cleared:Math.min(p.cleared|0,COUNTRIES.length),gold:p.gold|0,letters:Math.max(1,f.length)};
+}
+let pmMode=0;
+const $m=id=>document.getElementById(id),modal=$m('playModal');
+function pmFocus(el){document.querySelectorAll('.padfocus').forEach(x=>x.classList.remove('padfocus'));if(document.body.classList.contains('pad'))el.classList.add('padfocus');el.focus();}
+function homePlay(mode){
+  pmMode=mode;const s=savedGame();
+  if(!s){go('game.html?mode='+mode);return;}
+  const done=s.cleared>=COUNTRIES.length;
+  $m('pmTitle').textContent=mode?'👥 العب مع صاحبك':'▶ العب';
+  $m('pmInfo').innerHTML='<div class="where">'+(done?'🏆 كملتي المغامرة كاملة!':'🗺 المرحلة '+(s.cleared+1)+': '+COUNTRIES[s.cleared])+'</div>'+
+    '<div><b>'+s.cleared+'/'+COUNTRIES.length+'</b><small>مراحل</small></div><div><b>'+s.letters+'</b><small>'+(s.letters>1?'حروف':'حرف')+'</small></div><div><b>'+s.gold+'</b><small>🪙 فلوس</small></div>';
+  $m('pmMain').classList.remove('hide');$m('pmSure').classList.add('hide');
+  modal.classList.remove('hide');pmFocus($m('pmCont'));
+}
+document.querySelectorAll('a[href^="game.html"]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();clickSnd();homePlay(/mode=1/.test(a.getAttribute('href'))?1:0);}));
+$m('pmCont').onclick=()=>go('game.html?mode='+pmMode);
+$m('pmNew').onclick=()=>{$m('pmMain').classList.add('hide');$m('pmSure').classList.remove('hide');pmFocus($m('pmNo'));};
+$m('pmNo').onclick=()=>{$m('pmSure').classList.add('hide');$m('pmMain').classList.remove('hide');pmFocus($m('pmNew'));};
+$m('pmBack').onclick=()=>modal.classList.add('hide');
+$m('pmYes').onclick=()=>{try{localStorage.removeItem('atlasProg');localStorage.removeItem('atlasFound');}catch(e){}go('game.html?mode='+pmMode);};
+modal.addEventListener('click',e=>{if(e.target===modal)modal.classList.add('hide');});
+addEventListener('keydown',e=>{
+  if(!modal.classList.contains('hide')){if(e.key==='Escape')modal.classList.add('hide');return;}
+  if(e.key==='Enter'&&!e.target.closest('a,button'))homePlay(0);
+});
 document.getElementById('play').focus({preventScroll:true});
 </script>
 </body>

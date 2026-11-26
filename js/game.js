@@ -978,6 +978,7 @@ function drawPlay(){
 /* ================= LOOP ================= */
 function update(){
   pollPads();
+  if(window.LOADER&&LOADER.on){for(const k in pressed)delete pressed[k];frame++;return;} // no input behind the loading screen
   for(let p=0;p<2;p++){
     if(padTap(p,'start')){if(state==='play')pressed.Escape=true;else pressed.Enter=true;}
     if(padTap(p,'back')){if(state==='play'&&G.paused)pressed.Backspace=true;else pressed.Escape=true;}

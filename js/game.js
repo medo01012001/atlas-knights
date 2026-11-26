@@ -221,7 +221,7 @@ function hurtEnemy(e,dmg,dir,kb){
 }
 function killEnemy(e){
   e.dead=true;TUT.kills++;
-  const n=e.isBoss?5:e.elite?2:Math.random()<0.25?1:0; // only a coin now and then: the real reward comes when the stage is won
+  const n=e.isBoss?10:e.elite?3:1; // one coin for every monster (more for elites and the boss), plus the reward when the stage is won
   for(let i=0;i<n;i++)G.pick.push({type:'coin',x:e.x,y:e.y,z:20,vz:rnd(3,8),vx:rnd(-3.5,3.5),val:1,t:0});
   if(!e.isBoss&&Math.random()<0.07)G.pick.push({type:'heart',x:e.x,y:e.y,z:20,vz:5,vx:0,t:0});
   part(e.x,e.y,30,e.type==='skeleton'?'#e8e3d0':'#8a1a1a',12,3.5,5,35);

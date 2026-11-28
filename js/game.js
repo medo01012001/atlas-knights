@@ -92,7 +92,7 @@ let lastHitSnd=0,lastCoinSnd=0;
 fit();
 
 /* ================= DATA ================= */
-const JOIN_EVERY=2; // a new letter joins the team every 2 levels
+const JOIN_EVERY=1; // a new letter joins the team in every land (28 lands, 28 letters)
 const ED={
   goblin:{hp:40,spd:2.1,dmg:8,range:42,atkCd:55,gold:4,look:{sc:.8,body:'#6b4a2b',dark:'#3d2a18',skin:'#7fb04a',head:'goblin',weapon:'club'}},
   skeleton:{hp:58,spd:1.6,dmg:10,range:50,atkCd:65,gold:5,look:{sc:1,body:'#d9d4c0',dark:'#bdb8a4',skin:'#e6e1cf',head:'skull',weapon:'esword',ribs:true}},
@@ -110,7 +110,24 @@ const LV=[
   {name:'المرحلة 8: العراق',bg:7,types:['croc','dragon','orc','eagle','darcher'],boss:'العملاق الأزرق',blook:{body:'#2a5aa0',dark:'#163060',skin:'#9fc8f0',weapon:'hammer'}},
   {name:'المرحلة 9: عُمان',bg:8,types:['eagle','croc','dragon','golem','bat'],boss:'قرصان البحر',blook:{body:'#203a4a',dark:'#101e28',skin:'#c9a27a',weapon:'sword',cape:'#8a1a1a'}},
   {name:'المرحلة 10: اليمن',bg:10,types:['dragon','golem','orc','scorpion','eagle'],boss:'غول النار',blook:{body:'#5a1a0a',dark:'#2a0a04',skin:'#ff7a3a',weapon:'axe'}},
-  {name:'المرحلة 11: الربع الخالي',bg:4,types:['dragon','golem','croc','eagle','darcher'],boss:'سيد الظلام',blook:{body:'#1a1020',dark:'#0a0610',skin:'#7a2a2a',weapon:'sword',cape:'#600'}}
+  {name:'المرحلة 11: الحبشة',bg:2,types:['bat','eagle','orc','snake','golem'],boss:'حارس الهضبة',blook:{body:'#3a5a2a',dark:'#1e3014',skin:'#a8c070',weapon:'club'}},
+  {name:'المرحلة 12: الصومال',bg:8,types:['croc','scorpion','darcher','snake','eagle'],boss:'قرصان القرن',blook:{body:'#2a3a5a',dark:'#141e30',skin:'#c8a080',weapon:'sword',cape:'#1a5a8a'}},
+  {name:'المرحلة 13: زنجبار',bg:8,types:['croc','snake','bat','orc','darcher'],boss:'تمساح الجزيرة',blook:{body:'#2a6a4a',dark:'#143826',skin:'#7ac090',weapon:'axe'}},
+  {name:'المرحلة 14: تشاد',bg:1,types:['scorpion','snake','golem','eagle','darcher'],boss:'سيد البحيرة',blook:{body:'#5a4a2a',dark:'#302614',skin:'#d0b070',weapon:'hammer'}},
+  {name:'المرحلة 15: نيجيريا',bg:0,types:['goblin','snake','orc','bat','croc'],boss:'عملاق الغابة',blook:{body:'#3a6a2a',dark:'#1e3a14',skin:'#8ab050',weapon:'club',cape:'#2a4a1a'}},
+  {name:'المرحلة 16: مالي',bg:1,types:['scorpion','skeleton','darcher','golem','snake'],boss:'حارس المخطوطات',blook:{body:'#7a4a2a',dark:'#402414',skin:'#e0b080',weapon:'sword',cape:'#8a3a1a'}},
+  {name:'المرحلة 17: السنغال',bg:8,types:['croc','eagle','orc','darcher','bat'],boss:'ملك الموج',blook:{body:'#1a4a6a',dark:'#0e2638',skin:'#80c0e0',weapon:'axe',cape:'#0a3a5a'}},
+  {name:'المرحلة 18: تركيا',bg:5,types:['skeleton','eagle','orc','dragon','darcher'],boss:'فارس الأسوار',blook:{body:'#6a2a2a',dark:'#381414',skin:'#d0a090',weapon:'sword',cape:'#a01a1a'}},
+  {name:'المرحلة 19: أذربيجان',bg:10,types:['dragon','golem','bat','orc','eagle'],boss:'جني النار',blook:{body:'#6a2a0a',dark:'#381404',skin:'#ff9a4a',weapon:'hammer'}},
+  {name:'المرحلة 20: إيران',bg:9,types:['darcher','dragon','scorpion','orc','eagle'],boss:'حارس الحدائق',blook:{body:'#2a4a6a',dark:'#14263a',skin:'#a0c0d8',weapon:'sword',cape:'#3a6a9a'}},
+  {name:'المرحلة 21: أوزبكستان',bg:6,types:['eagle','golem','darcher','scorpion','dragon'],boss:'تاجر الحرير',blook:{body:'#5a2a6a',dark:'#2e1438',skin:'#c0a0d0',weapon:'axe',cape:'#6a1a7a'}},
+  {name:'المرحلة 22: أفغانستان',bg:2,types:['golem','eagle','bat','orc','dragon'],boss:'غول الجبال',blook:{body:'#5a6a7a',dark:'#30383f',skin:'#c8d8e0',weapon:'hammer'}},
+  {name:'المرحلة 23: باكستان',bg:7,types:['croc','dragon','darcher','golem','eagle'],boss:'العملاق الأخضر',blook:{body:'#1a5a3a',dark:'#0e301e',skin:'#80d0a0',weapon:'club',cape:'#0a4a2a'}},
+  {name:'المرحلة 24: بنغلاديش',bg:7,types:['croc','snake','bat','dragon','orc'],boss:'نمر النهر',blook:{body:'#8a5a1a',dark:'#4a300e',skin:'#ffb050',weapon:'axe'}},
+  {name:'المرحلة 25: المالديف',bg:8,types:['croc','eagle','darcher','golem','bat'],boss:'أخطبوط الجزر',blook:{body:'#3a2a6a',dark:'#1e1438',skin:'#b0a0f0',weapon:'sword',cape:'#2a1a5a'}},
+  {name:'المرحلة 26: ماليزيا',bg:0,types:['snake','croc','orc','dragon','eagle'],boss:'ظل الغابة',blook:{body:'#2a3a2a',dark:'#141e14',skin:'#7a9a6a',weapon:'axe',cape:'#1a2a1a'}},
+  {name:'المرحلة 27: إندونيسيا',bg:10,types:['dragon','golem','croc','eagle','darcher'],boss:'عملاق البركان',blook:{body:'#4a1a1a',dark:'#260c0c',skin:'#ff6a3a',weapon:'hammer',cape:'#600'}},
+  {name:'المرحلة 28: الربع الخالي',bg:4,types:['dragon','golem','croc','eagle','darcher'],boss:'سيد الظلام',blook:{body:'#1a1020',dark:'#0a0610',skin:'#7a2a2a',weapon:'sword',cape:'#600'}}
 ];
 
 /* ================= STATE ================= */
@@ -122,15 +139,15 @@ const menu={sel:0,p2sel:1,mode:new URLSearchParams(location.search).get('mode')=
 const MAX_FIELD=4; // letters on screen at the same time; the others wait on the bench
 let FOUND=[0];
 try{const v=JSON.parse(localStorage.getItem('atlasFound')||'[0]');if(Array.isArray(v))FOUND=v.filter(i=>Number.isInteger(i)&&i>=0&&i<HEROES.length);}catch(e){}
-if(!FOUND.includes(0))FOUND.unshift(0);FOUND.sort((a,b)=>a-b);
-function discover(i){if(FOUND.includes(i))return;FOUND.push(i);FOUND.sort((a,b)=>a-b);try{localStorage.setItem('atlasFound',JSON.stringify(FOUND));}catch(e){}}
-function nextLetter(have){for(let i=0;i<HEROES.length;i++)if(!have.includes(i))return i;return null;}
+if(!FOUND.includes(0))FOUND.unshift(0);FOUND.sort(abcSort);
+function discover(i){if(FOUND.includes(i))return;FOUND.push(i);FOUND.sort(abcSort);try{localStorage.setItem('atlasFound',JSON.stringify(FOUND));}catch(e){}}
+function nextLetter(have){for(const i of ABC)if(!have.includes(i))return i;return null;}
 const shop={hero:0,row:1,from:'play'};
 
 /* each level adds a little: 20 levels of health or power = double, 20 levels of skills = half the wait and +80% strength */
 function hMax(h){return Math.round(h.def.hp*(1+0.05*upg[h.idx].hp));}
 function hCrit(h){return 0.015*upg[h.idx].crit;}
-function hDmg(h){const c=Math.random()<hCrit(h);if(c&&G)addText(h.x,h.y,96,'ضربة حرجة!','#ffd24a');return h.def.dmg*(1+0.05*upg[h.idx].dmg)*(h.buffT>0?1.5:1)*(c?1.8:1);}
+function hDmg(h){const c=Math.random()<hCrit(h);if(c&&G)addText(h.x,h.y,96,'ضربة حرجة!','#ffd24a');return h.def.dmg*(1+0.05*upg[h.idx].dmg)*(h.buffT>0?1.5:1)*(c?1.8:1)*powDmgMul(h);}
 function hCd(h,base){return Math.round(base*(1-0.025*upg[h.idx].sk));}
 function hPow(h){return 1+0.04*upg[h.idx].sk;}
 function hSpd(h){return h.def.spd*(1+0.015*upg[h.idx].spd);}
@@ -155,7 +172,7 @@ function startLevel(n){
       else{const b=G.heroes.findIndex(o=>o.ctrl==='bot');if(b>=0){G.bench.push(G.heroes[b]);G.heroes[b]=h;}else G.bench.push(h);}
     }
   }
-  for(const h of G.roster){Object.assign(h,{z:0,lz:0,down:false,cdA:0,cdK:0,cdL:0,buffT:0,dashT:0,spinT:0,castT:0,atkT:0,hurtT:0,shieldT:0,leapT:0,combo:0,shots:0,inv:60,kx:0,face:1,tgt:null,swapCd:0});h.hp=hMax(h);}
+  for(const h of G.roster){Object.assign(h,{z:0,lz:0,down:false,cdA:0,cdK:0,cdL:0,buffT:0,dashT:0,spinT:0,castT:0,atkT:0,hurtT:0,shieldT:0,leapT:0,rageT:0,ghostT:0,orbT:0,combo:0,shots:0,inv:60,kx:0,face:1,tgt:null,swapCd:0});h.hp=hMax(h);}
   G.heroes.forEach((h,i)=>{h.x=110+i*40;h.y=FT+25+(i%3)*75;});
   if(joined){
     G.banner.t=260;
@@ -176,17 +193,18 @@ function swapIn(h,p){ // a player swaps his letter with the first one waiting on
   h.ctrl='bot';h.tgt=null;G.heroes[i]=nh;G.bench.push(h);
   ring(h.x,h.y,60,'#ffffff',18);addText(nh.x,nh.y,130,'⇄ '+nh.def.name,'#fff');SFX.skill();
 }
+function lvN(n){return n<10?n:10+(n-10)*0.45;} // how hard a land is: the far lands climb slower
 function genWave(n,w){
-  const L=LV[n],q=[],count=Math.round((5+n*1.1+w*2)*(0.62+0.12*G.heroes.length));
+  const L=LV[n],q=[],count=Math.round((5+lvN(n)*1.1+w*2)*(0.62+0.12*G.heroes.length));
   for(let i=0;i<count;i++)q.push(L.types[Math.floor(Math.random()*L.types.length)]);
   if(w===3)q.push('orc');
   return q;
 }
 function makeEnemy(type,x,y){
   /* every land is tougher: more health, harder hits, faster and quicker to strike — and from the 3rd land some golden elites */
-  const n=G.level,d=ED[type],elite=n>=2&&Math.random()<0.04+0.025*n,m=(1+0.26*n)*DIFF().hp*(elite?1.8:1);
+  const n=lvN(G.level),d=ED[type],elite=n>=2&&Math.random()<Math.min(0.3,0.04+0.025*n),m=(1+0.26*n)*DIFF().hp*(elite?1.8:1);
   const look=elite?Object.assign({},d.look,{sc:d.look.sc*1.18}):d.look;
-  return {kind:'enemy',type,d,look,elite,spdM:1+0.03*n,cdM:Math.max(0.6,1-0.035*n),x,y,z:0,vz:0,hp:d.hp*m,maxHp:d.hp*m,dmg:d.dmg*(1+0.17*n)*DIFF().dmg*(elite?1.3:1),face:-1,
+  return {kind:'enemy',type,d,look,elite,spdM:Math.min(1.35,1+0.03*n),cdM:Math.max(0.6,1-0.035*n),x,y,z:0,vz:0,hp:d.hp*m,maxHp:d.hp*m,dmg:d.dmg*(1+0.17*n)*DIFF().dmg*(elite?1.3:1),face:-1,
     cd:rnd(30,80),wind:0,stun:0,slow:0,kx:0,flash:0,walk:0,moving:false,atkT:0,atkMax:1,spdJ:rnd(0.85,1.15),offY:rnd(-20,20),dead:false};
 }
 function spawnEnemy(type){
@@ -195,9 +213,9 @@ function spawnEnemy(type){
   G.enemies.push(makeEnemy(type,x,rnd(FT+10,FB-10)));
 }
 function spawnBoss(){
-  const n=G.level,L=LV[n],m=(1+0.42*n)*(0.4+0.12*G.heroes.length)*DIFF().hp;
+  const n=lvN(G.level),L=LV[G.level],m=(1+0.42*n)*(0.4+0.12*G.heroes.length)*DIFF().hp;
   const look=Object.assign({sc:2.0,head:'boss'},L.blook);
-  const b={kind:'enemy',type:'boss',isBoss:true,name:L.boss,d:{spd:1.3+0.12*n,range:95,gold:0},look,
+  const b={kind:'enemy',type:'boss',isBoss:true,name:L.boss,d:{spd:Math.min(2.6,1.3+0.12*n),range:95,gold:0},look,
     x:G.bossX+380,y:(FT+FB)/2,z:0,vz:0,hp:1400*m,maxHp:1400*m,dmg:14*(1+0.18*n)*DIFF().dmg,face:-1,cd:0,wind:0,stun:0,slow:0,kx:0,flash:0,
     walk:0,moving:false,atkT:0,atkMax:1,bs:'walk',bt:0,acd:100,dead:false};
   G.enemies.push(b);G.boss=b;
@@ -221,9 +239,9 @@ function hurtEnemy(e,dmg,dir,kb){
 }
 function killEnemy(e){
   e.dead=true;TUT.kills++;
-  const n=e.isBoss?10:e.elite?3:1; // one coin for every monster (more for elites and the boss), plus the reward when the stage is won
+  const n=(e.isBoss?10:e.elite?3:1)+(powHas('gold')&&Math.random()<0.4?1:0); // one coin for every monster (more for elites and the boss), plus the reward when the stage is won
   for(let i=0;i<n;i++)G.pick.push({type:'coin',x:e.x,y:e.y,z:20,vz:rnd(3,8),vx:rnd(-3.5,3.5),val:1,t:0});
-  if(!e.isBoss&&Math.random()<0.07)G.pick.push({type:'heart',x:e.x,y:e.y,z:20,vz:5,vx:0,t:0});
+  if(!e.isBoss&&Math.random()<(powHas('hearts')?0.16:0.07))G.pick.push({type:'heart',x:e.x,y:e.y,z:20,vz:5,vx:0,t:0});
   part(e.x,e.y,30,e.type==='skeleton'?'#e8e3d0':'#8a1a1a',12,3.5,5,35);
   if(e.isBoss){
     G.bossDone=true;G.shake=18;SFX.boom();
@@ -259,6 +277,7 @@ function areaHit(x,y,r,dmg,kb,fn){
 function hurtHero(h,dmg,dir){
   if(h.down||h.inv>0||state!=='play')return;
   if(h.def.id==='guard'&&h.face===-dir)dmg*=0.6;
+  dmg=powHurt(h,dmg);if(dmg<=0)return;
   dmg*=hArm(h);
   dmg=Math.max(1,Math.round(dmg));
   h.hp-=dmg;h.flash=8;h.hurtT=26;h.kx=dir*4;h.inv=22;
@@ -287,6 +306,7 @@ function heroAttack(h){
       G.proj.push({type:'arrow',own:1,x:h.x+h.face*22,y:h.y,z:60,vx:h.face*13,vy:0,dmg:d*(g?1.4:1),life:60,r:10,gold:g,pierce:g});break;}
     case 'mage':SFX.fire();G.proj.push({type:'fire',own:1,burn:true,x:h.x+h.face*26,y:h.y,z:70,vx:h.face*8,vy:0,dmg:d,life:70,r:12});break;
     case 'baa':SFX.arrow();G.proj.push({type:'arrow',own:1,col:LET[4].col,x:h.x+h.face*22,y:h.y,z:10,vx:h.face*11,vy:0,dmg:d,life:60,r:10});break;
+    default:powAttack(h,d);
   }
 }
 function skillK(h){
@@ -300,6 +320,7 @@ function skillK(h){
       SFX.heal();addText(h.x,h.y,100,'بلسم الشفاء!','#9df0b8');break;
     case 'ain':h.leapT=h.leapMax=30;h.inv=Math.max(h.inv,32);break;
     case 'guard':h.atkT=16;h.atkMax=16;meleeHit(h,125,42,d*1.6,15,80);G.shake=Math.max(G.shake,7);ring(h.x+h.face*60,h.y,70,'#ffd28a',16);SFX.boom();break;
+    default:if(powSkill(h,h.def.k,d)===false)h.cdK=0;
   }
 }
 function skillL(h){
@@ -327,6 +348,7 @@ function skillL(h){
       }
       ring(h.x,h.y,200,'#ffd24a',30);SFX.heal();addText(h.x,h.y,110,'صرخة الحرب!','#ffd24a');
       break;
+    default:if(powSkill(h,h.def.l,d)===false)h.cdL=0;
   }
 }
 
@@ -362,6 +384,7 @@ function botInput(h){
   // support powers work even with no enemy around
   if(id==='guard'&&h.cdL<=0&&G.heroes.some(o=>o.down||o.hp<hMax(o)*0.35))inp.l=true;
   if(id==='baa'&&h.cdK<=0&&G.heroes.some(o=>!o.down&&o.hp<hMax(o)*0.6))inp.k=true;
+  if(h.def.k.fx)powBotSupport(h,inp);
   // dodge enemy arrows / orbs coming at me
   let dodge=0;
   for(const p of G.proj){if(p.own)continue;const dx=p.x-h.x;if(Math.sign(dx)===-Math.sign(p.vx)&&Math.abs(dx)<170&&Math.abs(p.y-h.y)<26){dodge=p.y>=h.y?-1:1;break;}}
@@ -413,6 +436,7 @@ function botInput(h){
   if(id==='guard'){if(h.cdK<=0&&inp.a&&(near>=2||e.isBoss))inp.k=true;}
   if(id==='baa'){if(h.cdL<=0&&(e.isBoss||countNear(h.x,h.y,220)>=4)&&G.heroes.some(o=>!o.down&&o.hp<hMax(o)*0.5))inp.l=true;}
   if(id==='ain'){if(h.cdK<=0&&adx>110&&adx<260&&Math.abs(dy)<30){inp.k=true;inp.faceTo=dir;}if(h.cdL<=0&&(countNear(h.x,h.y,420)>=4||e.isBoss&&e.bs!=='rest'))inp.l=true;}
+  if(h.def.k.fx)powBot(h,inp,e,dir,adx,dy);
   return inp;
 }
 function nearestEnemyDist(h){let b=1e9;for(const e of G.enemies){if(e.dead)continue;const d=Math.hypot(e.x-h.x,(e.y-h.y)*1.5);if(d<b)b=d;}return b;}
@@ -428,20 +452,21 @@ function updHero(h){
   if(h.def.id==='baa'&&frame%60===0){ // trait: heals nearby letters a little every second
     for(const o of G.heroes){if(o.down||Math.hypot(o.x-h.x,(o.y-h.y)*1.5)>180)continue;const mh=hMax(o);if(o.hp<mh){o.hp=Math.min(mh,o.hp+Math.ceil(mh*0.025));part(o.x,o.y,60,'#9df0b8',2,1,4,25);}}
   }
+  powHeroTick(h);
   if(h.leapT>0){
     h.leapT--;const pr=1-h.leapT/h.leapMax;h.lz=Math.sin(pr*Math.PI)*95;h.x+=h.face*6.5;h.moving=false;
-    if(h.leapT===0){h.lz=0;areaHit(h.x,h.y,115,hDmg(h)*2.4*hPow(h),8,e=>{e.stun=Math.max(e.stun,e.isBoss?10:50);});
-      ring(h.x,h.y,115,'#ff8ad0',22);part(h.x,h.y,8,'#ffc8e8',16,4,5,26);G.shake=Math.max(G.shake,8);SFX.boom();}
+    if(h.leapT===0){h.lz=0;areaHit(h.x,h.y,115,hDmg(h)*(h.leapM||2.4)*hPow(h),8,e=>{e.stun=Math.max(e.stun,e.isBoss?10:50);});
+      ring(h.x,h.y,115,LET[h.idx].col,22);part(h.x,h.y,8,LET[h.idx].light,16,4,5,26);G.shake=Math.max(G.shake,8);SFX.boom();}
     h.y=clamp(h.y,FT,FB);h.x=clamp(h.x,G.cam+20,G.cam+W-20);return;
   }
   const inp=h.ctrl==='bot'?botInput(h):playerInput(h.ctrl);
   h.cdA--;h.cdK--;h.cdL--;if(h.atkT>0)h.atkT--;
   if(h.dashT>0){
     h.dashT--;h.x+=h.face*10;h.moving=true;h.walk+=0.5;
-    meleeHit(h,45,32,hDmg(h)*2.5*hPow(h),7,0,h.dashSet);
-    if(frame%2===0)part(h.x-h.face*10,h.y,40,'#9fd0ff',2,1,5,15);
+    meleeHit(h,45,32,hDmg(h)*(h.dashM||2.5)*hPow(h),7,0,h.dashSet);
+    if(frame%2===0)part(h.x-h.face*10,h.y,40,LET[h.idx].light,2,1,5,15);
   }else{
-    const sp=hSpd(h)*(h.atkT>0&&h.def.type==='melee'?0.35:1)*(h.buffT>0?1.15:1)*(G.lock===null&&!G.enemies.length?1.3:1);
+    const sp=hSpd(h)*(h.atkT>0&&h.def.type==='melee'?0.35:1)*(h.buffT>0?1.15:1)*(h.ghostT>0?1.35:1)*(G.lock===null&&!G.enemies.length?1.3:1);
     if(G.readyT>0){inp.a=inp.k=inp.l=false;}
     let mx=inp.mx,my=inp.my;if(mx&&my){mx*=0.75;my*=0.75;}
     h.x+=mx*sp;h.y+=my*sp*0.75;
@@ -458,14 +483,14 @@ function updHero(h){
 /* ================= ENEMIES ================= */
 function nearestHero(e){
   let best=null,bd=1e9;
-  for(const h of G.heroes){if(h.down)continue;const d=Math.abs(h.x-e.x)+Math.abs(h.y-e.y)*1.5;if(d<bd){bd=d;best=h;}}
+  for(const h of G.heroes){if(h.down||h.ghostT>0)continue;const d=Math.abs(h.x-e.x)+Math.abs(h.y-e.y)*1.5;if(d<bd){bd=d;best=h;}}
   return best;
 }
 function enemyStrike(e){
   e.atkT=12;e.atkMax=12;
   if(e.d.ranged){const f=e.d.proj==='efire';f?SFX.fire():SFX.arrow();G.proj.push({type:f?'efire':'earrow',own:0,x:e.x+e.face*(f?34:18),y:e.y,z:f?96:44,vx:e.face*(f?6:7),vy:0,dmg:e.dmg,life:130,r:f?12:8});return;}
   SFX.swing();
-  for(const h of G.heroes){if(h.down)continue;const dx=(h.x-e.x)*e.face;if(dx>-10&&dx<e.d.range+12&&Math.abs(h.y-e.y)<28)hurtHero(h,e.dmg,e.face);}
+  for(const h of G.heroes){if(h.down)continue;const dx=(h.x-e.x)*e.face;if(dx>-10&&dx<e.d.range+12&&Math.abs(h.y-e.y)<28){hurtHero(h,e.dmg,e.face);if(h.def.pk==='thorns'&&!h.down)hurtEnemy(e,e.dmg*0.6,-e.face,2);}}
 }
 function updEnemy(e){
   if(e.flash>0)e.flash--;if(e.atkT>0)e.atkT--;
@@ -598,16 +623,19 @@ function updPlay(){
   }
   // projectiles
   for(const p of G.proj){
+    if(p.own)powProjTick(p);
     p.x+=p.vx;p.y+=p.vy;p.life--;
     if(p.y<FT-5||p.y>FB+5)p.vy=0;
     if(p.type==='fire'&&frame%2===0)part(p.x,p.y,p.z,'#ffa040',1,0.6,5,16);
     if(p.type==='orb'&&frame%3===0)part(p.x,p.y,p.z,'#c050ff',1,0.5,5,16);
-    if(p.own){
+    if(p.own&&!p.noHit){
       for(const e of G.enemies){
         if(e.dead||(p.hit&&p.hit.has(e)))continue;
         const bx=e.isBoss?40:16,by=e.isBoss?45:24;
         if(Math.abs(e.x-p.x)<p.r+bx&&Math.abs(e.y-p.y)<by){
-          hurtEnemy(e,p.dmg,Math.sign(p.vx)||1,p.type==='fire'?5:3);if(p.burn){e.burn=150;e.burnD=p.dmg*0.12;}
+          hurtEnemy(e,p.dmg,Math.sign(p.vx)||1,p.kb||(p.type==='fire'?5:3));if(p.burn){e.burn=150;e.burnD=p.dmg*0.12;}
+          if(p.eff)powEff(e,p.eff,p.dmg);if(p.stun)e.stun=Math.max(e.stun,e.isBoss?Math.round(p.stun/3):p.stun);
+          if(p.bounce>0&&powBounce(p,e))continue;
           if(p.type==='fire'){areaHit(p.x,p.y,60,p.dmg*0.5,4);ring(p.x,p.y,60,'#ff9030',16);part(p.x,p.y,p.z,'#ffb040',10,3,5,22);p.life=0;break;}
           if(p.pierce){(p.hit||(p.hit=new Set())).add(e);}else{p.life=0;break;}
         }
@@ -620,10 +648,12 @@ function updPlay(){
   G.proj=G.proj.filter(p=>p.life>0);
   // zones
   for(const z of G.zones){
+    if(z.kind){powZone(z);continue;}
     z.t--;if(z.t%10===0)areaHit(z.x,z.y,z.r,z.dmg,1);
-    for(let k=0;k<2;k++)G.fx.push({t:'rain',x:z.x+rnd(-z.r,z.r),y:z.y+rnd(-z.r*0.4,z.r*0.4),z:rnd(150,220),life:16,max:16});
+    for(let k=0;k<2;k++)G.fx.push({t:'rain',col:z.col,x:z.x+rnd(-z.r,z.r),y:z.y+rnd(-z.r*0.4,z.r*0.4),z:rnd(150,220),life:16,max:16});
   }
   G.zones=G.zones.filter(z=>z.t>0);
+  powTick();
   G.enemies=G.enemies.filter(e=>!e.dead);
   // pickups
   for(const c of G.pick){
@@ -658,7 +688,7 @@ function updPlay(){
     if(G.cpi<G.cps.length&&maxX>G.cps[G.cpi]-150){G.lock=G.cps[G.cpi];G.queue=genWave(G.level,G.cpi);G.cpi++;G.spawnT=10;G.readyT=120;G.intro=waveIntro(G.queue);if(G.intro){G.readyT=230;G.banner.t=0;}}
     else if(G.cpi>=G.cps.length&&!G.boss&&maxX>G.bossX-150){G.lock=G.bossX;G.queue=[];spawnBoss();G.readyT=130;}
   }
-  if(G.queue.length){if(--G.spawnT<=0&&G.enemies.length<6+G.level){spawnEnemy(G.queue.shift());G.spawnT=G.readyT>0?8:35;}}
+  if(G.queue.length){if(--G.spawnT<=0&&G.enemies.length<6+Math.min(G.level,9)){spawnEnemy(G.queue.shift());G.spawnT=G.readyT>0?8:35;}}
   if(G.readyT>0&&--G.readyT===0){G.fightT=50;SFX.skill();G.shake=Math.max(G.shake,4);} // ⚔ fight!
   if(G.fightT>0)G.fightT--;
   if(!G.readyT)G.intro=null;
@@ -825,13 +855,14 @@ function tagCol(h){return h.ctrl===0?'#4da3ff':h.ctrl===1?'#ff5b5b':'#b8b8b8';}
 function tagTxt(h){return h.ctrl===0?'P1':h.ctrl===1?'P2':'BOT';}
 function drawHero(h){
   const sx=h.x-G.cam,sy=h.y-h.z-(h.lz||0),L=LET[h.idx];
-  shadow(sx,h.y,L.id==='guard'||L.id==='baa'?30:20);
+  shadow(sx,h.y,L.sh||(L.id==='guard'||L.id==='baa'?30:20));
   if(h.buffT>0){ctx.strokeStyle='rgba(255,210,74,'+(0.4+0.3*Math.sin(frame*0.3))+')';ctx.lineWidth=3;ell(sx,h.y,30,9);ctx.stroke();}
   let alpha=null;
-  if(h.down)alpha=0.6;else if(h.inv>0&&h.z<=0&&frame%8<4)alpha=0.55;
+  if(h.down)alpha=0.6;else if(h.ghostT>0)alpha=0.3;else if(h.inv>0&&h.z<=0&&frame%8<4)alpha=0.55;
   const dotP=(h.def.id==='archer'||h.def.id==='baa')&&h.cdA>0?clamp(1-h.cdA/(h.def.atkCd*0.8),0,1):1;
   drawLetter({i:h.idx,x:sx,y:sy,face:h.face,sc:1,walk:h.walk,moving:h.moving,atk:h.atkT>0?1-h.atkT/h.atkMax:-1,flash:h.flash>0,alpha,
     spinP:h.spinT>0?1-h.spinT/(h.spinMax||24):-1,cast:h.castT>0?1-h.castT/h.castMax:-1,dash:h.dashT>0,hurt:h.hurtT>0?1-h.hurtT/26:0,down:h.down,dotP});
+  powDrawHero(h,sx,sy);
   if(h.spinT>0){ctx.strokeStyle='rgba(160,210,255,.6)';ctx.lineWidth=4;ell(sx,sy-45,58,22);ctx.stroke();}
   if(h.shieldT>0){const a=Math.min(1,h.shieldT/30);ctx.fillStyle='rgba(140,220,255,'+0.12*a+')';ell(sx,sy-L.top/2,L.top/2+16,L.top/2+16);ctx.fill();ctx.strokeStyle='rgba(140,220,255,'+0.7*a+')';ctx.lineWidth=2.5;ctx.stroke();}
   if(h.z>0)return;
@@ -873,7 +904,7 @@ function drawProj(p){
   }else if(p.type==='efire'){drawEfire(p,sx,sy);
   }else if(p.type==='orb'){
     ctx.fillStyle='rgba(190,60,255,.35)';circ(sx,sy,16);ctx.fillStyle='#9a20e0';circ(sx,sy,10);ctx.fillStyle='#f0c0ff';circ(sx,sy,4);
-  }
+  }else powDrawProj(p,sx,sy);
 }
 function drawPick(c){
   const sx=c.x-G.cam,sy=c.y-c.z-8;
@@ -888,7 +919,8 @@ function drawFx(f){
   else if(f.t==='ring'){const r=f.r*(1-a*0.7);ctx.strokeStyle=f.col;ctx.lineWidth=4*a+1;ell(sx,f.y,r,r/1.8);ctx.stroke();}
   else if(f.t==='slash'){ctx.strokeStyle=f.col;ctx.lineWidth=5*a+1;ctx.beginPath();const st=f.face>0?-1.3:Math.PI+1.3,en=f.face>0?1.0:Math.PI-1.0;ctx.arc(sx-f.face*14,f.y-45,f.r,st,en,f.face<0);ctx.stroke();}
   else if(f.t==='bolt'){ctx.strokeStyle='#e8f8ff';ctx.lineWidth=3;ctx.beginPath();let x=sx+rnd(-20,20),y=0;ctx.moveTo(x,y);const ty=f.y-f.z;while(y<ty){y+=rnd(18,34);x+=rnd(-14,14);ctx.lineTo(x,Math.min(y,ty));}ctx.stroke();ctx.strokeStyle='rgba(120,200,255,.6)';ctx.lineWidth=8;ctx.stroke();ctx.fillStyle='rgba(200,240,255,.6)';circ(sx,ty,18*a);}
-  else if(f.t==='rain'){ctx.fillStyle='#14121e';circ(sx,f.y-f.z,5);ctx.fillStyle=LET[1].col;circ(sx,f.y-f.z,3.4);}
+  else if(f.t==='rain'){ctx.fillStyle='#14121e';circ(sx,f.y-f.z,5);ctx.fillStyle=f.col||LET[1].col;circ(sx,f.y-f.z,3.4);}
+  else powDrawFx(f,sx,a);
   ctx.globalAlpha=1;
 }
 
@@ -993,15 +1025,17 @@ function drawPlay(){
   G.shake*=0.88;if(G.shake<0.5)G.shake=0;
   ctx.save();ctx.translate(sx,sy);
   drawBG(LV[G.level].bg,G.cam);
-  for(const z of G.zones){const zx=z.x-G.cam;ctx.fillStyle='rgba(255,220,120,.14)';ell(zx,z.y,z.r,z.r/1.8);ctx.fill();ctx.strokeStyle='rgba(255,220,120,.5)';ctx.lineWidth=2;ctx.stroke();}
+  for(const z of G.zones){if(z.kind){powDrawZone(z);continue;}const zx=z.x-G.cam;ctx.fillStyle='rgba(255,220,120,.14)';ell(zx,z.y,z.r,z.r/1.8);ctx.fill();ctx.strokeStyle='rgba(255,220,120,.5)';ctx.lineWidth=2;ctx.stroke();}
   const list=[];
   for(const c of G.pick)list.push({y:c.y,f:()=>drawPick(c)});
   for(const h of G.heroes)list.push({y:h.y+(h.down?-50:0),f:()=>drawHero(h)});
   for(const e of G.enemies)list.push({y:e.y,f:()=>drawEnemy(e)});
   for(const p of G.proj)list.push({y:p.y,f:()=>drawProj(p)});
+  for(const z of G.zones)if(z.kind)list.push({y:z.y,f:()=>powDrawZoneTall(z)});
   list.sort((a,b)=>a.y-b.y);
   for(const d of list)d.f();
   for(const f of G.fx)drawFx(f);
+  powDrawOver();
   if(G.flashT>0){ctx.fillStyle='rgba(255,200,240,'+(G.flashT/28)+')';ctx.fillRect(-20,-20,W+40,H+40);}
   for(const t of G.texts){ctx.globalAlpha=Math.min(1,t.life/20);txt(t.s,t.x-G.cam,t.y-t.z,16,t.col);ctx.globalAlpha=1;}
   ctx.restore();

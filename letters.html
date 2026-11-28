@@ -13,7 +13,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/ui.css?v=24">
+<link rel="stylesheet" href="css/ui.css?v=25">
 <style>
 .cards{grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
 .card .in{display:flex;flex-direction:column;gap:12px;padding:14px}
@@ -37,6 +37,9 @@
 .skill span{font-size:14px;color:var(--muted);font-weight:600}
 .type{position:absolute;top:10px;right:10px;z-index:2}
 .count{font-size:18px}
+.abc{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin:14px auto 4px;max-width:900px;direction:rtl}
+.abc span{width:44px;height:48px;display:grid;place-items:center;border-radius:10px;font-size:30px;font-weight:800;line-height:1;background:rgba(255,255,255,.06);color:#5a5878;border:2px solid rgba(255,255,255,.08)}
+.abc span.got{color:#fff;background:var(--col);border-color:rgba(0,0,0,.45);text-shadow:0 2px 0 rgba(0,0,0,.45)}
 .hint{text-align:center;margin-top:28px;color:var(--muted)}
 </style>
 </head>
@@ -47,7 +50,8 @@
     <div class="mid"><span class="ribbon gold">📜 الحروف ديالك</span></div>
     <span class="pill count" id="count"></span>
   </div>
-  <p class="hint" style="margin:8px 0 26px">كليكي على الحرف باش تشوفو كيضرب ✨</p>
+  <div class="abc" id="abc"></div>
+  <p class="hint" style="margin:8px 0 26px">كليكي على الحرف باش تشوفو كيضرب ✨ • الحروف الرمادية مازال كيتسناوك فالخريطة</p>
   <div class="grid cards" id="cards"></div>
 </div>
 <template id="tpl">
@@ -64,14 +68,17 @@
   </article>
 </template>
 <p class="credit">🎮 لعبة من تطوير <b>المهدي وهبي</b> • © 2026</p>
-<script src="js/core.js?v=24"></script>
-<script src="js/data.js?v=24"></script>
-<script src="js/letters.js?v=24"></script>
-<script src="js/site.js?v=24"></script>
+<script src="js/core.js?v=25"></script>
+<script src="js/data.js?v=25"></script>
+<script src="js/letters.js?v=25"></script>
+<script src="js/site.js?v=25"></script>
 <script>
 'use strict';
 const MAX={hp:170,spd:3.5,dmg:19,rate:1/13};
-document.getElementById('count').textContent='عندك '+FOUND_LIST.length+(FOUND_LIST.length===1?' حرف':' حروف');
+FOUND_LIST.sort(abcSort);
+document.getElementById('count').textContent='عندك '+FOUND_LIST.length+' من '+HEROES.length+' حرف';
+// the whole alphabet: the letters you found shine, the others wait for you on the map
+document.getElementById('abc').innerHTML=ABC.map(i=>{const got=FOUND_LIST.includes(i);return '<span class="'+(got?'got':'')+'" style="--col:'+LET[i].col+'" title="'+HEROES[i].name+'">'+HEROES[i].ch+'</span>';}).join('');
 const box=document.getElementById('cards'),tpl=document.getElementById('tpl');
 for(const i of FOUND_LIST){
   const H=HEROES[i],L=LET[i],el=tpl.content.firstElementChild.cloneNode(true);

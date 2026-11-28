@@ -23,13 +23,14 @@ const hasVoice=()=>!!(SET.voice&&VOICE.ar.length&&window.speechSynthesis);
 const VPROF={n:{v:'female',p:1,r:0.95},d:{v:'male',p:0.15,r:0.82},h:{v:'female',p:1.85,r:1.05},
   0:{v:'male',p:1.05,r:1},1:{v:'female',p:1.3,r:1.05},2:{v:'male',p:0.8,r:0.95},3:{v:'male',p:0.6,r:0.92},4:{v:'female',p:1.45,r:1.02},5:{v:'female',p:1.1,r:1.08}};
 /* ---- recorded lines (assets/voice/<id>.mp3, made with Google AI Studio). assets/voice/list.txt lists the ready ones ---- */
+for(let i=6;i<HEROES.length;i++)VPROF[i]={v:i%2?'female':'male',p:0.75+((i*37)%60)/100,r:0.95+((i*13)%14)/100}; // the 22 new letters
 const CLIP={ready:null,cache:{},cur:null,map:null};
 try{fetch('assets/voice/list.txt?v=13').then(r=>r.ok?r.text():'').then(t=>{CLIP.ready=new Set(t.split(/\s+/).filter(Boolean));}).catch(()=>{CLIP.ready=new Set();});}catch(e){CLIP.ready=new Set();}
 /* every spoken line with its id and speaker — also the source of the voice script */
 function voiceLines(){
   const L=[],add=(id,w,text)=>L.push({id,w,text});
-  storyIntro().forEach((sl,k)=>add('intro_'+(k+1),sl.w,sl.text));
-  (typeof COUNTRY!=='undefined'?COUNTRY:[]).forEach((c,k)=>add('cage_'+(k+1),'n',storyMeet(0,0,c.c)[0].text));
+  storyIntro().forEach((sl,k)=>add(sl.vid||'intro_'+(k+1),sl.w,sl.text));
+  (typeof COUNTRY!=='undefined'?COUNTRY:[]).forEach((c,k)=>add(c.v?'cage_'+c.v:'cage_x'+(k+1),'n',storyMeet(0,0,c.c)[0].text));
   for(const i in MEET)add('meet_'+i,+i,MEET[i]);
   BEATS.forEach((f,k)=>f(9).forEach((sl,j)=>add('beat_'+(k+1)+'abc'[j],sl.w===9?'f':sl.w,sl.text)));
   storyGate().forEach((sl,k)=>add('gate_'+(k+1),sl.w,sl.text));

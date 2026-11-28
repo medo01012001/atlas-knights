@@ -30,6 +30,7 @@ const LET=(function(){
 })();
 const LET_R=3; // cache resolution per game unit (sharp up to ~3x zoom)
 function buildLetter(L,mode){ // mode: 'n' normal, 's' silhouette
+  if(L.glyph)return buildGlyph(L,mode);
   const [x0,y0,x1,y1]=L.box,c=document.createElement('canvas');
   c.width=Math.ceil((x1-x0)*LET_R);c.height=Math.ceil((y1-y0)*LET_R);
   const g=c.getContext('2d');g.scale(LET_R,LET_R);g.translate(-x0,-y0);g.lineCap='round';g.lineJoin='round';
@@ -45,6 +46,67 @@ function buildLetter(L,mode){ // mode: 'n' normal, 's' silhouette
   }
   return c;
 }
+/* the other 22 letters come straight from the font (Baloo Bhaijaan 2): measured once it is loaded,
+   eyes on the thickest part of the body, feet under its lowest part, dots stay where the font puts them */
+function mixCol(a,b,t){const p=s=>[1,3,5].map(k=>parseInt(s.substr(k,2),16)),A=p(a),B=p(b);return '#'+A.map((v,k)=>Math.round(v+(B[k]-v)*t).toString(16).padStart(2,'0')).join('');}
+const GLYPH_FONT=s=>'800 '+s+'px "Baloo Bhaijaan 2","Segoe UI",Tahoma,sans-serif';
+for(let i=LET.length;i<HEROES.length;i++){const D=HEROES[i];LET.push({id:D.id,ch:D.ch,glyph:true,rng:D.type!=='melee',col:D.col,light:mixCol(D.col,'#ffffff',0.55),dark:mixCol(D.col,'#000000',0.5)});}
+function measureGlyph(L){
+  const S=160,C=320,BASE=Math.round(C*0.64),c=document.createElement('canvas');c.width=C;c.height=C;
+  const g=c.getContext('2d',{willReadFrequently:true});
+  g.font=GLYPH_FONT(S);g.textAlign='center';g.textBaseline='alphabetic';g.fillStyle='#000';g.fillText(L.ch,C/2,BASE);
+  const px=g.getImageData(0,0,C,C).data,N=C*C,M=new Uint8Array(N);
+  for(let k=0;k<N;k++)M[k]=px[k*4+3]>110?1:0;
+  // the biggest connected piece is the body (the dots are the small ones)
+  const lab=new Int32Array(N).fill(-1),sizes=[],st=[];
+  for(let k=0;k<N;k++){
+    if(!M[k]||lab[k]>=0)continue;const id=sizes.length;let n=0;st.push(k);lab[k]=id;
+    while(st.length){const q=st.pop(),x=q%C,y=(q-x)/C;n++;
+      if(x>0&&M[q-1]&&lab[q-1]<0){lab[q-1]=id;st.push(q-1);}
+      if(x<C-1&&M[q+1]&&lab[q+1]<0){lab[q+1]=id;st.push(q+1);}
+      if(y>0&&M[q-C]&&lab[q-C]<0){lab[q-C]=id;st.push(q-C);}
+      if(y<C-1&&M[q+C]&&lab[q+C]<0){lab[q+C]=id;st.push(q+C);}}
+    sizes.push(n);
+  }
+  if(!sizes.length){Object.assign(L,{gsc:1,gfs:100,gx:0,gy:-7,box:[-30,-90,30,0],top:90,eyeX:0,eyeY:-50,cy:-45,feet:[-8,8],legTop:-9,sh:20});return;}
+  let body=0;sizes.forEach((n,k)=>{if(n>sizes[body])body=k;});
+  let x0=C,y0=C,x1=0,y1=0,by1=0;
+  for(let k=0;k<N;k++){if(!M[k])continue;const x=k%C,y=(k-x)/C;if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y;if(lab[k]===body&&y>by1)by1=y;}
+  // distance to the edge inside the body (two-pass chamfer): the eyes go where the body is thickest, a bit toward the top
+  const Dt=new Float32Array(N);for(let k=0;k<N;k++)Dt[k]=lab[k]===body?1e6:0;
+  for(let y=1;y<C-1;y++)for(let x=1;x<C-1;x++){const k=y*C+x;if(Dt[k])Dt[k]=Math.min(Dt[k],Dt[k-1]+1,Dt[k-C]+1,Dt[k-C-1]+1.414,Dt[k-C+1]+1.414);}
+  for(let y=C-2;y>0;y--)for(let x=C-2;x>0;x--){const k=y*C+x;if(Dt[k])Dt[k]=Math.min(Dt[k],Dt[k+1]+1,Dt[k+C]+1,Dt[k+C+1]+1.414,Dt[k+C-1]+1.414);}
+  let best=-1,ex=C/2,ey=BASE-40;const bh=Math.max(1,by1-y0);
+  for(let y=y0;y<=by1;y++)for(let x=x0;x<=x1;x++){const v=Dt[y*C+x];if(!v||v>=1e6)continue;const s=v*(1+0.3*(1-(y-y0)/bh));if(s>best){best=s;ex=x;ey=y;}}
+  // the feet stand under the lowest part of the body
+  let fx0=C,fx1=0;for(let y=Math.max(0,by1-9);y<=by1;y++)for(let x=x0;x<=x1;x++)if(lab[y*C+x]===body){if(x<fx0)fx0=x;if(x>fx1)fx1=x;}
+  const gw=x1-x0+1,gh=y1-y0+1,sc=Math.min(98/gh,112/gw,0.9),cx=(x0+x1)/2,BOT=-7;
+  const X=v=>(v-cx)*sc,Y=v=>(v-y1)*sc+BOT;
+  L.gsc=sc;L.gfs=S*sc;L.gx=X(C/2);L.gy=Y(BASE);
+  L.box=[Math.floor(X(x0)-5),Math.floor(Y(y0)-5),Math.ceil(X(x1)+5),2];
+  L.top=-L.box[1];L.cy=Math.round(L.box[1]/2);
+  L.eyeX=Math.round(X(ex));L.eyeY=Math.round(Math.max(Y(ey),L.box[1]+12));
+  const fc=X((fx0+fx1)/2),span=(fx1-fx0)*sc;
+  L.feet=span<26?[fc-7,fc+7]:[Math.max(fc-30,X(fx0)+7),Math.min(fc+30,X(fx1)-7)];
+  L.legTop=Y(by1)-3;L.sh=clamp((L.box[2]-L.box[0])*0.3,18,34);
+}
+function buildGlyph(L,mode){
+  if(!L.gsc)measureGlyph(L);
+  const [x0,y0,x1,y1]=L.box,w=Math.ceil((x1-x0)*LET_R),h=Math.ceil((y1-y0)*LET_R);
+  const mk=()=>{const c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d');g.scale(LET_R,LET_R);g.translate(-x0,-y0);
+    g.font=GLYPH_FONT(L.gfs);g.textAlign='center';g.textBaseline='alphabetic';g.lineJoin='round';return [c,g];};
+  const [c,g]=mk(),OUT=mode==='s'?'#0b0b14':'#14121e';
+  g.strokeStyle=OUT;g.lineWidth=6;g.strokeText(L.ch,L.gx,L.gy);g.fillStyle=OUT;g.fillText(L.ch,L.gx,L.gy);
+  if(mode==='s')return c;
+  const gr=g.createLinearGradient(0,y0,0,y1);gr.addColorStop(0,L.light);gr.addColorStop(0.45,L.col);gr.addColorStop(1,L.dark);
+  g.fillStyle=gr;g.fillText(L.ch,L.gx,L.gy);
+  const [s,sg]=mk(); // soft shine on the top-left edges
+  sg.fillStyle='#fff';sg.fillText(L.ch,L.gx,L.gy);sg.globalCompositeOperation='destination-out';sg.fillText(L.ch,L.gx+2.2,L.gy+2.4);
+  g.setTransform(1,0,0,1,0,0);g.globalAlpha=0.4;g.drawImage(s,0,0);
+  return c;
+}
+function rebuildGlyphs(){for(const L of LET)if(L.glyph){L.gsc=0;L.cv=buildLetter(L,'n');L.sil=buildLetter(L,'s');}if(typeof _layers!=='undefined'){_layers={};_layerN=0;}}
+try{document.fonts.load(GLYPH_FONT(160),LET.filter(L=>L.glyph).map(L=>L.ch).join('')).then(rebuildGlyphs).catch(()=>{});}catch(e){}
 for(const L of LET){L.cv=buildLetter(L,'n');L.sil=buildLetter(L,'s');}
 
 function letterEyes(L,o,face){
@@ -77,7 +139,7 @@ function drawLetter(o){
     else{sy*=1+Math.sin(t)*0.025;sx*=1-Math.sin(t)*0.02;}
     if(o.atk>=0){const k=Math.sin(o.atk*Math.PI);
       if(L.id==='knight'){rot+=face*k*0.55;tx+=face*k*12;}
-      else if(L.id==='archer'||L.id==='baa'){sx*=1+k*0.14;sy*=1-k*0.1;tx-=face*k*6;}
+      else if(L.id==='archer'||L.id==='baa'||L.rng){sx*=1+k*0.14;sy*=1-k*0.1;tx-=face*k*6;}
       else if(L.id==='mage'){rot-=face*k*0.2;sy*=1+k*0.08;}
       else if(L.id==='ain'){rot+=face*k*0.35;tx+=face*k*10;}
       else{tx+=face*k*16;sx*=1+k*0.13;sy*=1-k*0.12;}}

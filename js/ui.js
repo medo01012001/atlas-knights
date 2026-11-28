@@ -198,9 +198,10 @@ function drawHUD(){
   for(const cp of G.cps.concat([G.bossX])){const px=W/2-110+220*clamp((cp-W/2)/(G.end-W),0,1);ctx.fillStyle=INK;circ(px,88.5,4.5);ctx.fillStyle='#fff';circ(px,88.5,2.8);}
   txt('💀',W/2+128,89,14,'#fff',false);
   if(G.bench.length){
-    const hp=G.roster.some(h=>h.ctrl===1),pw=Math.max(hp?150:96,20+G.bench.length*46);
+    const hp=G.roster.some(h=>h.ctrl===1),NB=Math.min(4,G.bench.length),more=G.bench.length-NB,pw=Math.max(hp?150:96,20+NB*46+(more?40:0)); // the next 4 to come in, then "+N"
     panel(10,110,pw,84,{frame:FRAMES.steel,r:12,b:3,noCorners:true});
-    G.bench.forEach((b,k)=>medallion(34+k*46,138,19,b.idx,{dim:b.down,ring:FRAMES.steel}));
+    G.bench.slice(0,NB).forEach((b,k)=>medallion(34+k*46,138,19,b.idx,{dim:b.down,ring:FRAMES.steel}));
+    if(more)txt('+'+more,34+NB*46+4,138,15,'#d8d6ee','center',INK);
     keyRow(10+pw/2,176,hp?['⇄',[KL.KeyQ],'/',['Num 0']]:['⇄',[KL.KeyQ],'بدل'],10);
   }
   if(G.goT>0&&G.lock===null&&Math.floor(G.goT/15)%2===0){
@@ -268,7 +269,7 @@ function drawShop(){
     const ay=wy+wh/2,arrow=(ax,lab,d)=>{const hv=overBox(ax-20,ay-20,40,40);ctx.fillStyle=INK;circ(ax,ay,20);ctx.fillStyle=vgrad(ay-18,ay+18,hv?['#fff8c0','#ffd84a']:GOLDB);circ(ax,ay,17.5);
       txt(lab,ax,ay+1,18,'#fff','#6a3000');hit(ax-20,ay-20,40,40,()=>{shop.hero=(shop.hero+d+N)%N;SFX.coin();});};
     arrow(wx-4,'◀',1);arrow(wx+ww+4,'▶',-1);
-    for(let k=0;k<N;k++){const dx=wx+ww/2+((N-1)/2-k)*16;ctx.fillStyle=INK;circ(dx,wy+wh+12,5.5);ctx.fillStyle=k===shop.hero?'#ffd24a':'#4a4e70';circ(dx,wy+wh+12,4);}
+    const st=Math.min(16,(ww-16)/N),dr=Math.min(4,st*0.36);for(let k=0;k<N;k++){const dx=wx+ww/2+((N-1)/2-k)*st;ctx.fillStyle=INK;circ(dx,wy+wh+12,dr+1.5);ctx.fillStyle=k===shop.hero?'#ffd24a':'#4a4e70';circ(dx,wy+wh+12,dr);}
   }
   // name, level, numbers
   const iy=wy+wh+26,lvl=1+UPK.reduce((a,k)=>a+u[k],0);
@@ -343,13 +344,16 @@ function drawWin(){
   ribbonFit(W/2,72,'🏆 مبروك! ربحتو اللعبة 🏆',30,'#c8800e',380);
   pill(W/2,126,'الكتاب الكبير رجع كامل... والهمزة رجعات للعائلة','#3a3f78',16);
   txt('🎮 لعبة من تطوير المهدي وهبي',W/2,162,15,'#ffe9a8','center',INK);
-  const RL=G.roster.map(h=>h.idx),NH=RL.length,st=Math.min(150,(W-60)/NH);
-  for(let k=0;k<NH;k++){
-    const i=RL[k],x=W/2+((NH-1)/2-k)*st,jump=Math.abs(Math.sin(frame*0.1+i))*30,py=392;
+  const RL=G.roster.map(h=>h.idx).sort(abcSort),NH=RL.length,NR=NH>12?2:1,PR=Math.ceil(NH/NR),st=Math.min(150,(W-60)/PR),ps=Math.min(1,st/72);
+  for(let k=0;k<NH;k++){ // with many letters: two rows (the back one is drawn first)
+    const row=NR>1?Math.floor(k/PR):0,c=k-row*PR,inRow=Math.min(PR,NH-row*PR);
+    const i=RL[k],x=W/2+((inRow-1)/2-c)*st,jump=Math.abs(Math.sin(frame*0.1+i))*(NR>1?16:30),py=NR>1?(row?408:338):392;
+    ctx.save();ctx.translate(x,py);ctx.scale(ps,ps);ctx.translate(-x,-py);
     ctx.fillStyle=INK;ctx.fillRect(x-34,py-2,68,24);ell(x,py+22,34,10);ctx.fill();
     ctx.fillStyle=vgrad(py,py+22,['#e8d6b0','#9a8058']);ctx.fillRect(x-31,py,62,22);ell(x,py+22,31,8);ctx.fill();
     ctx.fillStyle=INK;ell(x,py,34,11);ctx.fill();ctx.fillStyle='#fff0c8';ell(x,py,31,8.5);ctx.fill();
-    drawHeroLook(i,x,py-jump,1,Math.min(1.25,st/115),{atk:(frame+i*20)%60<16?((frame+i*20)%60)/16:-1});
+    ctx.restore();
+    drawHeroLook(i,x,py-jump*ps,1,Math.min(1.25,st/115,NR>1?0.62:9),{atk:(frame+i*20)%60<16?((frame+i*20)%60)/16:-1});
   }
   coinPill(W/2,446,gold,'center');
   btn(W/2-120,472,240,46,'🗺 رجوع للخريطة',resetMenu,'gold',{glow:true});

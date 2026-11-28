@@ -11,7 +11,29 @@ const MEET={ // what each letter says when you free it
   2:'أنا الطاء! العصا ديالي كانت مجمدة بالجليد ديال الظلام... دابا رجعات فيها النار.',
   3:'الصاد هنا! كنت كنحرس باب المدينة حتى غلبوني بالكثرة... ولكن هاد المرة ما غاديش نطيح.',
   4:'أنا الباء، الطبيب ديال الحروف. إلى تجرحتو فالطريق، أنا معاكم.',
-  5:'العين! كنت كنشوف كلشي من فوق السور... وعيني عمرها ما كتغلط.'
+  5:'العين! كنت كنشوف كلشي من فوق السور... وعيني عمرها ما كتغلط.',
+  6:'أنا التاء! عندي جوج نقط فوق راسي... ونرميهم بجوج على جيش الظلام!',
+  7:'الثاء هنا! ثلاث نقط، ثلاث ضربات... شكرا حيت فكيتيني.',
+  8:'أنا الجيم، صبار بحال الجمل. حبسوني فالقفص ولكن ما عييتش... يالاه نمشيو!',
+  9:'الحاء! كنت سخون بالغضب وأنا فالقفص... دابا غادي نحرق جيش الظلام.',
+  10:'خفيف بحال الخيال... أنا الخاء! ما غادي يشوفوني حتى نكون حداهم.',
+  11:'الدال هنا! صغير، صحيح؟ ولكن جرب تدفعني... غادي تشوف.',
+  12:'أنا الذال، والنقطة ديالي من ذهب! كل عدو نطيحو كيعطيني عملة.',
+  13:'الراء! بحال الريح ما كنبقاش فبلاصتي... وإلا جا الرعد، أنا اللي جبتو.',
+  14:'الزاي هنا، كنحب الزوابع! اللي يقرب ليا كيدور على راسو.',
+  15:'أنا السين، عندي ثلاث سنان بحال المنشار... والسيف ديالي ما كيرحمش.',
+  16:'الشين! ثلاث نقط كيضويو بحال الشمس... الظلام ما كيحملش الضو ديالي.',
+  17:'أنا الضاد! العربية كيسميوها «لغة الضاد» على قبلي... غادي نبقا معاكم حتى للخر.',
+  18:'الظاء... كنت مخبي فالظل. دابا الظل ديالي غادي يخدم معاكم.',
+  19:'الغين! حبسوني وأنا غضبان... وملي كنغضب، حتى حد ما كيوقفني.',
+  20:'أنا الفاء، وقلبي كبير بحال الفيل! غادي نحط الفخوخ للظلام فالطريق.',
+  21:'القاف هنا! كنضوي بحال القمر فالليل... والنقط ديالي كيدوزو من وسط الأعداء.',
+  22:'الكاف! كنلعب بالكور بحال البهلوان... شوف كيفاش كتنقز من عدو لعدو!',
+  23:'أنا اللام، طويل بحال السوط. اللي بعيد عليا، نجبدو لعندي.',
+  24:'الميم! كنبني المنارات باش الحروف ما يتلفوش فالظلام.',
+  25:'الهاء! فرحان بزاف حيت شفتكم... جبت ليكم الهدايا والقلوب.',
+  26:'أنا الواو، أزرب حرف فالحروف! يالاه، شكون يسبقني؟',
+  27:'الياء... آخر حرف فالحروف! دابا رجعنا كاملين، من الألف حتى للياء!'
 };
 /* what you learn about the Dark Lord, in the order you meet the letters (n = the new letter) */
 const BEATS=[
@@ -33,9 +55,10 @@ function storyIntro(){
     {w:'n',cast:none,bg:4,img:'theft',fx:'dark',text:'واحد الليلة، دخل خيال كحل للمكتبة... وسرق «الدواية الذهبية»، المداد اللي كيعطي الحياة للحروف.'},
     {w:'d',cast:none,bg:4,img:'theft',text:'من اليوم، حتى حرف ما غادي يتكتب! والبلاد كاملة غادي تنسى الكلام... ههههه!'},
     {w:'n',cast:none,bg:2,img:'scatter',text:'الحروف تفرقو فالبلدان العربية، من المغرب حتى لجزيرة العرب... وجيش الظلام حبسهم فالغابات والصحرا والجبال.'},
-    {w:'p',bg:0,img:'dawn',text:'آش وقع؟! الكتاب خاوي... وصحابي فين مشاو؟'},
-    {w:'p',bg:0,img:'dawn',text:'ما عنديش الاختيار. غادي نقلب عليهم واحد بواحد، ونرجع الدواية الذهبية من قلعة الظلام!'},
-    {w:'n',bg:0,img:'dawn',text:'وهكا بدات المغامرة... واللي غادي يوقع فاللخر، حتى واحد ما كان كيتسناه. ⚔'}
+    {w:'n',cast:none,bg:8,img:'scatter',vid:'intro_4b',text:'وشي حروف طاروا حتى لبلدان بعيدة، فإفريقيا وآسيا... البلدان اللي وصلاتهم العربية مع الإسلام، حتى لإندونيسيا!'},
+    {w:'p',bg:0,img:'dawn',vid:'intro_5',text:'آش وقع؟! الكتاب خاوي... وصحابي فين مشاو؟'},
+    {w:'p',bg:0,img:'dawn',vid:'intro_6',text:'ما عنديش الاختيار. غادي نقلب عليهم واحد بواحد، ونرجع الدواية الذهبية من قلعة الظلام!'},
+    {w:'n',bg:0,img:'dawn',vid:'intro_7',text:'وهكا بدات المغامرة... واللي غادي يوقع فاللخر، حتى واحد ما كان كيتسناه. ⚔'}
   ];
 }
 function storyMeet(i,k,place){
@@ -43,7 +66,7 @@ function storyMeet(i,k,place){
   return withImg([{w:'n',text:'ف'+place+'، لقيتي حرف محبوس فقفص ديال الظلام... ضربتي القفل حتى تهرّس!'},{w:i,text:MEET[i]}].concat(b?b(i):[]),cageImg(place));
 }
 /* each land has its own picture of the broken cage (assets/story/cage_<stage>.jpg); the old shared one is the fallback */
-function cageImg(place){const n=typeof COUNTRY!=='undefined'?COUNTRY.findIndex(c=>c.c===place):-1;return n>=0?'cage_'+n:'cage';}
+function cageImg(place){const c=typeof COUNTRY!=='undefined'?COUNTRY.find(o=>o.c===place):null;return c&&c.pic!=null?'cage_'+c.pic:'cage';}
 function storyGate(){
   return withImg([
     {w:'n',text:'قلعة الظلام... اللخر ديال الطريق. السما كحلة والريح باردة.'},
@@ -84,9 +107,12 @@ function playStory(slides,done,title){
   if(!slides||!slides.length){done&&done();return;}
   for(const sl of slides)storyImg(sl.img); // start loading the pictures
   preloadLines(slides); // and the recorded voices
-  Object.assign(STORY,{slides,i:0,ch:0,t:0,done,title:title||'',cast:G?G.roster.map(h=>h.idx):[],bg:G?LV[G.level].bg:0});
+  Object.assign(STORY,{slides,i:0,ch:0,t:0,done,title:title||'',cast:G?storyCast():[],bg:G?LV[G.level].bg:0});
   state='story';
 }
+/* who stands on the stage: the letters on the field, plus the newest one (the ending shows everybody) */
+function storyCast(){const c=G.heroes.map(h=>h.idx),last=G.roster[G.roster.length-1];if(last&&!c.includes(last.idx))c.push(last.idx);return slidesAll()?G.roster.map(h=>h.idx):c.slice(0,6);}
+function slidesAll(){return STORY.slides.some(sl=>sl.fx==='unite');}
 function storyNext(){
   const s=STORY.slides[STORY.i];
   if(s&&STORY.ch<s.text.length){STORY.ch=s.text.length;return;}
@@ -162,8 +188,10 @@ function drawStory(){
   const sp=spIdx(s.w),cast=s.cast||STORY.cast;
   if(s.fx==='unite'){
     drawUnite();
-    cast.filter(i=>i!==0).forEach((i,k)=>{const side=k%2?1:-1,x=W/2+side*(170+Math.floor(k/2)*80),bob=Math.abs(Math.sin(frame*0.12+k))*12;
-      drawLetter({i,x,y:372-bob,face:-side,sc:0.85,walk:0,moving:false,atk:-1,flash:false,spinP:-1,cast:-1,hurt:0});});
+    const U=cast.filter(i=>i!==0),many=U.length>8; // all the letters around the Alef: two rows when there are many
+    U.map((i,k)=>{const side=k%2?1:-1,j=Math.floor(k/2),back=many&&j%2===1,col=many?Math.floor(j/2):j;return {i,k,side,back,x:W/2+side*(many?150+col*46+(back?23:0):170+col*80),y:back?330:372};})
+      .sort((a,b)=>a.y-b.y).forEach(o=>{const bob=Math.abs(Math.sin(frame*0.12+o.k))*12;
+      drawLetter({i:o.i,x:o.x,y:o.y-bob,face:-o.side,sc:many?(o.back?0.55:0.64):0.85,walk:0,moving:false,atk:-1,flash:false,spinP:-1,cast:-1,hurt:0});});
   }else{
     const n=cast.length,gap=n>1?Math.min(95,(W*0.5-110)/(n-1)):0;
     cast.forEach((i,k)=>{

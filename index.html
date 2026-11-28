@@ -14,7 +14,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/ui.css?v=24">
+<link rel="stylesheet" href="css/ui.css?v=25">
 <style>
 html,body{height:100%;overflow:hidden}
 body{background:#5ec4f4}
@@ -135,10 +135,10 @@ body.has-art #scene{display:none}
   </div></div>
 </div>
 <footer class="foot"><span><span class="key wide">Enter</span> ولا <span class="key wide">Start</span> باش تلعب</span><span>•</span><span>النسخة 1.1</span><span>•</span><span>🎮 تطوير: <b>المهدي وهبي</b></span></footer>
-<script src="js/core.js?v=24"></script>
-<script src="js/data.js?v=24"></script>
-<script src="js/letters.js?v=24"></script>
-<script src="js/site.js?v=24"></script>
+<script src="js/core.js?v=25"></script>
+<script src="js/data.js?v=25"></script>
+<script src="js/letters.js?v=25"></script>
+<script src="js/site.js?v=25"></script>
 <script>
 'use strict';
 /* the splash: the six letters charging into battle against the shadow army */
@@ -210,12 +210,13 @@ body.has-art #scene{display:none}
 })();
 document.getElementById('fs').onclick=()=>{try{if(!document.fullscreenElement)document.documentElement.requestFullscreen();else document.exitFullscreen();}catch(e){}};
 /* play: continue the saved adventure or start a new one */
-const COUNTRIES=['المغرب','الجزائر','تونس','ليبيا','مصر','لبنان','سوريا','العراق','عُمان','اليمن','الربع الخالي'];
+const COUNTRIES=['المغرب','الجزائر','تونس','ليبيا','مصر','لبنان','سوريا','العراق','عُمان','اليمن','الحبشة','الصومال','زنجبار','تشاد','نيجيريا','مالي','السنغال','تركيا','أذربيجان','إيران','أوزبكستان','أفغانستان','باكستان','بنغلاديش','المالديف','ماليزيا','إندونيسيا','الربع الخالي'];
 function savedGame(){
   let p=null,f=[0];
   try{p=JSON.parse(localStorage.getItem('atlasProg')||'null');}catch(e){}
   try{const v=JSON.parse(localStorage.getItem('atlasFound')||'[0]');if(Array.isArray(v))f=v;}catch(e){}
   if(!p||!(p.cleared>0||p.intro||(p.gold|0)>0||f.length>1))return null;
+  if(!p.lands&&(p.cleared|0)>=11)p.cleared=10; // old 11-land saves: the journey now goes on
   return {cleared:Math.min(p.cleared|0,COUNTRIES.length),gold:p.gold|0,letters:Math.max(1,f.length)};
 }
 let pmMode=0;
